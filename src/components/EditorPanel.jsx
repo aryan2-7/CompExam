@@ -1,3 +1,15 @@
+// Pairs that auto-close, and the full set of closing chars we allow "skip over" for.
+const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
+const CLOSERS = new Set(Object.values(PAIRS));
+
+// Applies a value + selection to the textarea and notifies React in one go.
+function commit(el, next, selStart, selEnd, onChange) {
+  el.value = next;
+  el.selectionStart = selStart;
+  el.selectionEnd = selEnd ?? selStart;
+  onChange(next);
+}
+
 export default function EditorPanel({
   question,
   code,
@@ -10,15 +22,133 @@ export default function EditorPanel({
   shaking,
 }) {
   const handleKeyDown = (e) => {
+    const el = e.target;
+    const { value } = el;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+
+    // Tab / Shift+Tab — indent or outdent by 4 spaces.
     if (e.key === "Tab") {
       e.preventDefault();
-      const el = e.target;
-      const start = el.selectionStart;
-      const end = el.selectionEnd;
-      const next = el.value.slice(0, start) + "    " + el.value.slice(end);
-      el.value = next;
-      el.selectionStart = el.selectionEnd = start + 4;
-      onChange(next);
+
+      if (start !== end) {
+        // Multi-line selection: indent/outdent every touched line.
+        const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+        const before = value.slice(0, lineStart);
+        const selected = value.slice(lineStart, end);
+        const after = value.slice(end);
+
+        let newSelected;
+        let firstLineDelta = 0;
+        if (e.shiftKey) {
+          let removedFirst = 0;
+          newSelected = selected
+            .split("\n")
+            .map((line, i) => {
+              const removeCount = line.startsWith("    ")
+                ? 4
+                : line.match(/^ */)[0].length;
+              if (i === 0) removedFirst = removeCount;
+              return line.slice(removeCount);
+            })
+            .join("\n");
+          firstLineDelta = -removedFirst;
+        } else {
+          newSelected = selected
+            .split("\n")
+            .map((line) => "    " + line)
+            .join("\n");
+          firstLineDelta = 4;
+        }
+
+        const next = before + newSelected + after;
+        commit(el, next, start + firstLineDelta, start + firstLineDelta + newSelected.length, onChange);
+        return;
+      }
+
+      if (e.shiftKey) {
+        // Outdent the current line by up to 4 spaces.
+        const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+        const leading = value.slice(lineStart).match(/^ */)[0];
+        const removeCount = Math.min(4, leading.length);
+        const next = value.slice(0, lineStart) + value.slice(lineStart + removeCount);
+        const pos = start - removeCount;
+        commit(el, next, pos, pos, onChange);
+        return;
+      }
+
+      const next = value.slice(0, start) + "    " + value.slice(end);
+      commit(el, next, start + 4, start + 4, onChange);
+      return;
+    }
+
+    // Enter — auto-indent to match the previous line's leading whitespace,
+    // and add one extra level if the line ends with an opening bracket.
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+      const currentLine = value.slice(lineStart, start);
+      const indent = currentLine.match(/^ */)[0];
+
+      const charBefore = value[start - 1];
+      const charAfter = value[start];
+      const opensBlock = charBefore in PAIRS && PAIRS[charBefore] === charAfter;
+
+      if (opensBlock) {
+        // Cursor is between a bracket pair, e.g. `{|}` — expand into a block.
+        const inner = "\n" + indent + "    ";
+        const closingLine = "\n" + indent;
+        const next = value.slice(0, start) + inner + closingLine + value.slice(end);
+        const pos = start + inner.length;
+        commit(el, next, pos, pos, onChange);
+        return;
+      }
+
+      const extra = /[{([]\s*$/.test(currentLine) ? "    " : "";
+      const insert = "\n" + indent + extra;
+      const next = value.slice(0, start) + insert + value.slice(end);
+      const pos = start + insert.length;
+      commit(el, next, pos, pos, onChange);
+      return;
+    }
+
+    // Auto-close brackets and quotes; skip over an existing closer instead of
+    // inserting a duplicate.
+    if (Object.prototype.hasOwnProperty.call(PAIRS, e.key) && start === end) {
+      const opener = e.key;
+      const closer = PAIRS[opener];
+      const charAfter = value[start];
+
+      // For quotes, don't auto-pair if we're right before a word character
+      // (likely closing an existing string or mid-word apostrophe).
+      const isQuote = opener === '"' || opener === "'";
+      if (isQuote && /\w/.test(charAfter || "")) {
+        return; // let the browser insert the raw character
+      }
+
+      e.preventDefault();
+      const next = value.slice(0, start) + opener + closer + value.slice(end);
+      commit(el, next, start + 1, start + 1, onChange);
+      return;
+    }
+
+    // Typing a closing char right before the same char already there: skip over it.
+    if (CLOSERS.has(e.key) && start === end && value[start] === e.key) {
+      e.preventDefault();
+      commit(el, value, start + 1, start + 1, onChange);
+      return;
+    }
+
+    // Backspace between an auto-inserted pair (e.g. `(|)`): delete both.
+    if (e.key === "Backspace" && start === end && start > 0) {
+      const charBefore = value[start - 1];
+      const charAfter = value[start];
+      if (PAIRS[charBefore] === charAfter) {
+        e.preventDefault();
+        const next = value.slice(0, start - 1) + value.slice(start + 1);
+        commit(el, next, start - 1, start - 1, onChange);
+        return;
+      }
     }
   };
 
