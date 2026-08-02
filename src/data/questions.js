@@ -623,6 +623,241 @@ export const QUESTIONS = [
       "try/catch(int) printing `Caught in main!`, and print `Valid number` if " +
       "no exception occurred.",
   },
+  {
+    id: "virtual-functions-animal-sound",
+    title: "Runtime Polymorphism with Virtual Functions",
+    difficulty: "easy",
+    body:
+      "Create a base class `Animal` with a virtual function `speak()` that " +
+      "prints `\"Some generic sound\"`. Create derived classes `Dog` (prints " +
+      "`\"Woof\"`) and `Cat` (prints `\"Meow\"`), each overriding `speak()`. " +
+      "Read an integer `choice` from standard input: if `choice` is `1`, call " +
+      "`speak()` through a base-class pointer pointing to a `Dog`; otherwise, " +
+      "point it at a `Cat`.",
+    input: "A single integer `choice` (1 or 2).",
+    output: "The sound printed by the overridden `speak()` of the selected animal.",
+    examples: [
+      { input: "1", output: "Woof" },
+      { input: "2", output: "Meow" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "1", expected: "Woof" },
+      { input: "2", expected: "Meow" },
+    ],
+    hint:
+      "declare `virtual void speak()` in `Animal`, override it in `Dog` and " +
+      "`Cat` with `void speak() override`. in main, declare `Animal* a`, " +
+      "point it at a `Dog` or `Cat` object based on `choice`, then call " +
+      "`a->speak()` — the virtual dispatch picks the right override at runtime.",
+  },
+  {
+    id: "friend-function-box-volume",
+    title: "Friend Function for Box Volume",
+    difficulty: "easy",
+    body:
+      "Create a class `Box` with a private integer attribute `length`. Declare " +
+      "a non-member function `int getVolume(Box b1, Box b2)` as a `friend` of " +
+      "`Box`, which returns the product of the two boxes' `length` values. " +
+      "Read two integers from standard input, construct two `Box` objects, and " +
+      "print the result of `getVolume`.",
+    input: "Two space-separated integers: the lengths of the two boxes.",
+    output: "A single integer: the product of the two lengths.",
+    examples: [{ input: "3 4", output: "12" }],
+    starterCode: SHELL,
+    tests: [
+      { input: "3 4", expected: "12" },
+      { input: "5 6", expected: "30" },
+      { input: "1 1", expected: "1" },
+      { input: "10 10", expected: "100" },
+    ],
+    hint:
+      "give `Box` a private int `length` and a constructor that sets it. " +
+      "inside the class, declare `friend int getVolume(Box b1, Box b2);`. " +
+      "define `getVolume` outside the class (no `Box::` prefix needed since " +
+      "it's a friend, not a member) — it can access `b1.length` and " +
+      "`b2.length` directly despite them being private.",
+  },
+  {
+    id: "stream-operator-overloading-point",
+    title: "Overloading << and >> for a Point Class",
+    difficulty: "medium",
+    body:
+      "Create a class `Point` with public integers `x` and `y`. Overload the " +
+      "stream extraction operator `>>` to read a `Point` from `cin`, and the " +
+      "stream insertion operator `<<` to print it as `(x, y)`. Both should be " +
+      "implemented as `friend` functions returning references to the stream " +
+      "so they can be chained. Read one point and print it back.",
+    input: "Two space-separated integers: `x` and `y`.",
+    output: "The point formatted as `(x, y)`.",
+    examples: [{ input: "3 4", output: "(3, 4)" }],
+    starterCode: SHELL,
+    tests: [
+      { input: "3 4", expected: "(3, 4)" },
+      { input: "-1 5", expected: "(-1, 5)" },
+      { input: "0 0", expected: "(0, 0)" },
+    ],
+    hint:
+      "declare `friend ostream& operator<<(ostream& os, const Point& p);` and " +
+      "`friend istream& operator>>(istream& is, Point& p);` inside `Point`. " +
+      "define both outside the class: `operator<<` writes `\"(\" << p.x << " +
+      "\", \" << p.y << \")\"` and returns `os`; `operator>>` reads into " +
+      "`p.x` and `p.y` and returns `is`.",
+  },
+  {
+    id: "file-write-read-roundtrip",
+    title: "Writing and Reading a File",
+    difficulty: "medium",
+    body:
+      "Read a name and an integer score from standard input. Write both to a " +
+      "file called `data.txt` using `ofstream`, close it, then open the same " +
+      "file with `ifstream`, read the name and score back, and print them.",
+    input: "A name (no spaces) and an integer score, space-separated.",
+    output: "The name and score read back from the file, space-separated.",
+    examples: [{ input: "Ram 85", output: "Ram 85" }],
+    starterCode: SHELL_STRING,
+    tests: [
+      { input: "Ram 85", expected: "Ram 85" },
+      { input: "Sita 92", expected: "Sita 92" },
+    ],
+    hint:
+      "include `<fstream>`. open `ofstream out(\"data.txt\")`, write " +
+      "`name << \" \" << score`, then `out.close()`. open " +
+      "`ifstream in(\"data.txt\")`, read back into a string and an int with " +
+      "`in >> readName >> readScore`, then print them space-separated.",
+  },
+  {
+    id: "dynamic-array-sum",
+    title: "Dynamic Memory with new and delete",
+    difficulty: "medium",
+    body:
+      "Create a class `IntArray` that allocates an integer array of size `n` " +
+      "on the heap using `new` inside its constructor, reads `n` integers " +
+      "into it, and provides a `sum()` method. Free the memory with `delete[]` " +
+      "in the destructor. Read `n` followed by `n` integers, and print their sum.",
+    input: "An integer `n`, then `n` space-separated integers.",
+    output: "A single integer: the sum of the values.",
+    examples: [{ input: "3\n1 2 3", output: "6" }],
+    starterCode: SHELL,
+    tests: [
+      { input: "3\n1 2 3", expected: "6" },
+      { input: "5\n10 20 30 40 50", expected: "150" },
+      { input: "1\n7", expected: "7" },
+    ],
+    hint:
+      "in the constructor, do `data = new int[n]` and read each element with " +
+      "a loop of `cin >> data[i]`. `sum()` loops over `size` adding up " +
+      "`data[i]`. in `~IntArray()`, call `delete[] data` to avoid a memory leak.",
+  },
+  {
+    id: "multiple-inheritance-teamlead",
+    title: "Multiple Inheritance for Total Pay",
+    difficulty: "medium",
+    body:
+      "Create two unrelated base classes: `Employee` with an integer " +
+      "`baseSalary`, and `Manager` with an integer `bonus`. Create a class " +
+      "`TeamLead` that inherits from both and provides a `totalPay()` method " +
+      "returning `baseSalary + bonus`. Read both values from standard input " +
+      "and print the total.",
+    input: "Two space-separated integers: `baseSalary` and `bonus`.",
+    output: "A single integer: their sum.",
+    examples: [{ input: "50000 5000", output: "55000" }],
+    starterCode: SHELL,
+    tests: [
+      { input: "50000 5000", expected: "55000" },
+      { input: "30000 2000", expected: "32000" },
+      { input: "0 0", expected: "0" },
+    ],
+    hint:
+      "`class TeamLead : public Employee, public Manager` inherits both " +
+      "bases at once. give `TeamLead` a constructor that forwards its two " +
+      "arguments to `Employee(b)` and `Manager(bo)` in the initializer list, " +
+      "then `totalPay()` just returns `baseSalary + bonus`.",
+  },
+  {
+    id: "comparison-operator-fraction",
+    title: "Overloading < to Compare Fractions",
+    difficulty: "medium",
+    body:
+      "Create a class `Fraction` with integers `num` and `den`. Overload the " +
+      "`<` operator as a member function to compare two fractions by cross-" +
+      "multiplication (avoid floating point). Read two fractions from " +
+      "standard input; print `\"First is smaller\"` if the first is less than " +
+      "the second, otherwise print `\"Second is smaller or equal\"`.",
+    input: "Four space-separated integers: `n1 d1 n2 d2`.",
+    output: "Either `First is smaller` or `Second is smaller or equal`.",
+    examples: [
+      { input: "1 2 3 4", output: "First is smaller" },
+      { input: "3 4 1 2", output: "Second is smaller or equal" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "1 2 3 4", expected: "First is smaller" },
+      { input: "3 4 1 2", expected: "Second is smaller or equal" },
+      { input: "1 2 1 2", expected: "Second is smaller or equal" },
+    ],
+    hint:
+      "overload `bool operator<(const Fraction& other) const` and compare " +
+      "`num * other.den < other.num * den` instead of dividing, so it stays " +
+      "exact with integers. in main, read the four ints, build two " +
+      "`Fraction`s, and branch on `a < b`.",
+  },
+  {
+    id: "custom-exception-negative-age",
+    title: "Custom Exception Class",
+    difficulty: "hard",
+    body:
+      "Create a class `NegativeAgeException` that publicly inherits from " +
+      "`std::exception` and overrides `what()` to return a custom message. " +
+      "Write a function `checkAge(int age)` that throws this exception if " +
+      "`age` is negative, otherwise prints `\"Valid age: <age>\"`. Read an " +
+      "integer, call `checkAge`, and catch the exception to print " +
+      "`\"Error: <message>\"` if thrown.",
+    input: "A single integer `age` (can be negative).",
+    output:
+      "Either `Valid age: <age>` or `Error: Age cannot be negative`.",
+    examples: [
+      { input: "25", output: "Valid age: 25" },
+      { input: "-5", output: "Error: Age cannot be negative" },
+    ],
+    starterCode:
+      "#include <iostream>\n#include <exception>\n#include <string>\nusing namespace std;\n\nint main() {\n\n    return 0;\n}\n",
+    tests: [
+      { input: "25", expected: "Valid age: 25" },
+      { input: "-5", expected: "Error: Age cannot be negative" },
+      { input: "0", expected: "Valid age: 0" },
+    ],
+    hint:
+      "`class NegativeAgeException : public exception` stores a `string " +
+      "message` and overrides `const char* what() const noexcept` to return " +
+      "`message.c_str()`. `checkAge` does `if (age < 0) throw " +
+      "NegativeAgeException(\"Age cannot be negative\");`. wrap the call in " +
+      "`try { ... } catch (NegativeAgeException& e) { cout << \"Error: \" << " +
+      "e.what(); }`.",
+  },
+  {
+    id: "template-class-two-types-pair",
+    title: "Template Class with Two Type Parameters",
+    difficulty: "hard",
+    body:
+      "Create a template class `Pair<T1, T2>` holding two private members " +
+      "`first` (type `T1`) and `second` (type `T2`), with a constructor and a " +
+      "`display()` method that prints them space-separated. Instantiate it as " +
+      "`Pair<string, int>`, reading a name and an age from standard input.",
+    input: "A name (no spaces) and an integer age, space-separated.",
+    output: "The name and age printed space-separated.",
+    examples: [{ input: "Hari 21", output: "Hari 21" }],
+    starterCode: SHELL_STRING,
+    tests: [
+      { input: "Hari 21", expected: "Hari 21" },
+      { input: "Gita 19", expected: "Gita 19" },
+    ],
+    hint:
+      "`template <typename T1, typename T2> class Pair { T1 first; T2 " +
+      "second; public: Pair(T1 a, T2 b) : first(a), second(b) {} void " +
+      "display() { cout << first << \" \" << second << endl; } };`. in main, " +
+      "instantiate `Pair<string, int> p(name, age);` and call `p.display()`.",
+  },
 ];
 
 export const DIFFICULTIES = ["easy", "medium", "hard"];
