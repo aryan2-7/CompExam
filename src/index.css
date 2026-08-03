@@ -402,6 +402,55 @@ body {
 
 .code-input:focus { background: #101223; }
 
+.code-input-wrap {
+  position: relative;
+}
+
+/* Invisible clone of .code-input used only to measure where the caret
+   lands in pixels (textareas don't expose this natively). Must match the
+   textarea's box model closely — width/padding/font are copied at runtime
+   in JS, this just sets the parts that don't change. */
+.code-input-mirror {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  z-index: -1;
+}
+
+.autocomplete-menu {
+  position: absolute;
+  z-index: 20;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  min-width: 140px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #171a2e;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.autocomplete-menu li {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.autocomplete-menu li.active,
+.autocomplete-menu li:hover {
+  background: #2d3153;
+}
+
 .run-row {
   display: flex;
   align-items: center;

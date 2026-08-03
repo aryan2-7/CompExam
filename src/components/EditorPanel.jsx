@@ -1,8 +1,22 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 // Pairs that auto-close, and the full set of closing chars we allow "skip over" for.
 const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
 const CLOSERS = new Set(Object.values(PAIRS));
+
+// A handful of C++ keywords/stdlib names worth suggesting even before the
+// user has typed them anywhere else in the buffer.
+const BASE_WORDS = [
+  "include", "iostream", "using", "namespace", "std", "int", "float",
+  "double", "char", "bool", "void", "string", "vector", "return", "main",
+  "cin", "cout", "endl", "if", "else", "for", "while", "class", "struct",
+  "public", "private", "protected", "virtual", "override", "static",
+  "const", "true", "false", "new", "delete", "this", "template",
+  "typename", "friend", "operator", "throw", "try", "catch",
+];
+
+const IDENTIFIER_RE = /[A-Za-z_][A-Za-z0-9_]*/g;
+const MAX_SUGGESTIONS = 6;
 
 export default function EditorPanel({
   question,
@@ -16,6 +30,7 @@ export default function EditorPanel({
   shaking,
 }) {
   const textareaRef = useRef(null);
+  const mirrorRef = useRef(null);
   // Selection to restore after React re-renders with the new `code` value.
   // We never write el.value or el.selectionStart directly from inside the
   // keydown handler — mutating the DOM node while it's a React-controlled
@@ -26,6 +41,11 @@ export default function EditorPanel({
   // layout effect applies that caret position after the DOM has the new
   // value committed, so there's exactly one writer of el.value (React).
   const pendingSelection = useRef(null);
+
+  // Autocomplete dropdown state.
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [menuPos, setMenuPos] = useState(null);
 
   useLayoutEffect(() => {
     const sel = pendingSelection.current;
@@ -43,11 +63,133 @@ export default function EditorPanel({
     onChangeFn(next);
   }
 
+  // Returns { word, wordStart } for the identifier immediately before the
+  // caret, or null if the caret isn't inside/after a word.
+  function currentWord(value, caret) {
+    let i = caret;
+    while (i > 0 && /[A-Za-z0-9_]/.test(value[i - 1])) i--;
+    if (i === caret) return null;
+    return { word: value.slice(i, caret), wordStart: i };
+  }
+
+  // Computes the pixel position of the caret within the textarea by
+  // rendering an invisible mirror <div> with identical font/box metrics
+  // and measuring where a marker span lands — textareas don't expose
+  // caret coordinates directly, so this is the standard workaround.
+  function caretPixelPosition(el, caret) {
+    const mirror = mirrorRef.current;
+    if (!mirror) return null;
+    const style = window.getComputedStyle(el);
+    [
+      "boxSizing", "width", "paddingTop", "paddingRight", "paddingBottom",
+      "paddingLeft", "borderTopWidth", "borderRightWidth", "borderBottomWidth",
+      "borderLeftWidth", "fontFamily", "fontSize", "fontWeight", "lineHeight",
+      "letterSpacing", "tabSize", "whiteSpace", "wordWrap",
+    ].forEach((prop) => {
+      mirror.style[prop] = style[prop];
+    });
+    mirror.style.whiteSpace = "pre-wrap";
+    mirror.style.wordWrap = "break-word";
+
+    const before = el.value.slice(0, caret);
+    mirror.textContent = before;
+    const marker = document.createElement("span");
+    marker.textContent = "\u200b";
+    mirror.appendChild(marker);
+
+    const top = marker.offsetTop - el.scrollTop;
+    const left = marker.offsetLeft - el.scrollLeft;
+    return { top, left };
+  }
+
+  function closeSuggestions() {
+    setSuggestions([]);
+    setActiveIndex(0);
+    setMenuPos(null);
+  }
+
+  // Recomputes the suggestion list for the word currently being typed.
+  // Runs after every keystroke that could change the buffer or caret.
+  function refreshSuggestions(el, value, caret) {
+    const cw = currentWord(value, caret);
+    if (!cw || cw.word.length < 2) {
+      closeSuggestions();
+      return;
+    }
+
+    const found = new Set();
+    let match;
+    IDENTIFIER_RE.lastIndex = 0;
+    while ((match = IDENTIFIER_RE.exec(value))) {
+      const w = match[0];
+      // Skip the occurrence the caret is currently sitting inside — it's
+      // the word being typed, not a completion candidate for itself.
+      const atCaret = match.index === cw.wordStart && match.index + w.length >= caret;
+      if (!atCaret) found.add(w);
+    }
+    BASE_WORDS.forEach((w) => found.add(w));
+
+    const lower = cw.word.toLowerCase();
+    const list = [...found]
+      .filter((w) => w !== cw.word && w.toLowerCase().startsWith(lower))
+      .sort((a, b) => a.length - b.length)
+      .slice(0, MAX_SUGGESTIONS);
+
+    if (list.length === 0) {
+      closeSuggestions();
+      return;
+    }
+
+    setSuggestions(list);
+    setActiveIndex(0);
+    const pos = caretPixelPosition(el, caret);
+    setMenuPos(pos);
+  }
+
+  // Inserts `word` in place of the identifier currently being typed.
+  function acceptSuggestion(word) {
+    const el = textareaRef.current;
+    if (!el) return;
+    const caret = el.selectionStart;
+    const cw = currentWord(el.value, caret);
+    if (!cw) return;
+    const next = el.value.slice(0, cw.wordStart) + word + el.value.slice(caret);
+    const pos = cw.wordStart + word.length;
+    closeSuggestions();
+    commit(next, pos, pos, onChange);
+  }
+
   const handleKeyDown = (e) => {
     const el = e.target;
     const { value } = el;
     const start = el.selectionStart;
     const end = el.selectionEnd;
+
+    // While the suggestion dropdown is open, arrow keys navigate it and
+    // Enter/Tab accept the highlighted entry instead of their normal
+    // editor behavior (newline / indent).
+    if (suggestions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % suggestions.length);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
+        return;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        acceptSuggestion(suggestions[activeIndex]);
+        return;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeSuggestions();
+        return;
+      }
+    }
 
     // Tab / Shift+Tab — indent or outdent by 4 spaces.
     if (e.key === "Tab") {
@@ -192,6 +334,20 @@ export default function EditorPanel({
     }
   };
 
+  // Re-evaluate suggestions after every change to the buffer (typing,
+  // pasting, or any of the editor shortcuts above via commit()).
+  const handleChange = (e) => {
+    const el = e.target;
+    onChange(el.value);
+    // Selection hasn't moved from a plain typed character, so read it
+    // straight off the element rather than waiting for a re-render.
+    refreshSuggestions(el, el.value, el.selectionStart);
+  };
+
+  const handleClick = () => {
+    closeSuggestions();
+  };
+
   return (
     <section className="panel editor-panel">
       <div className="panel-tab editor-tab">
@@ -203,15 +359,44 @@ export default function EditorPanel({
         </div>
       </div>
 
-      <textarea
-        ref={textareaRef}
-        className="code-input"
-        spellCheck={false}
-        value={code}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        aria-label="code editor"
-      />
+      <div className="code-input-wrap">
+        <textarea
+          ref={textareaRef}
+          className="code-input"
+          spellCheck={false}
+          value={code}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onClick={handleClick}
+          onBlur={closeSuggestions}
+          aria-label="code editor"
+        />
+        {/* Invisible measuring element used to compute caret pixel position
+            for the autocomplete dropdown; never shown to the user. */}
+        <div ref={mirrorRef} className="code-input-mirror" aria-hidden="true" />
+        {suggestions.length > 0 && menuPos && (
+          <ul
+            className="autocomplete-menu"
+            style={{ top: menuPos.top + 24, left: menuPos.left + 20 }}
+          >
+            {suggestions.map((word, i) => (
+              <li
+                key={word}
+                className={i === activeIndex ? "active" : ""}
+                onMouseDown={(e) => {
+                  // onMouseDown (not onClick) so this fires before the
+                  // textarea's onBlur closes the menu.
+                  e.preventDefault();
+                  acceptSuggestion(word);
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+              >
+                {word}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="run-row">
         <button
