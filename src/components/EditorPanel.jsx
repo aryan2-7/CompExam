@@ -1,14 +1,8 @@
+import { useLayoutEffect, useRef } from "react";
+
 // Pairs that auto-close, and the full set of closing chars we allow "skip over" for.
 const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
 const CLOSERS = new Set(Object.values(PAIRS));
-
-// Applies a value + selection to the textarea and notifies React in one go.
-function commit(el, next, selStart, selEnd, onChange) {
-  el.value = next;
-  el.selectionStart = selStart;
-  el.selectionEnd = selEnd ?? selStart;
-  onChange(next);
-}
 
 export default function EditorPanel({
   question,
@@ -21,6 +15,34 @@ export default function EditorPanel({
   lines,
   shaking,
 }) {
+  const textareaRef = useRef(null);
+  // Selection to restore after React re-renders with the new `code` value.
+  // We never write el.value or el.selectionStart directly from inside the
+  // keydown handler — mutating the DOM node while it's a React-controlled
+  // input is what causes characters to flicker/disappear when typing fast
+  // (e.g. "<<"): React re-renders on its own schedule and can clobber or
+  // race with a manual DOM write. Instead we hand React the new string via
+  // onChange and separately record where the caret should end up; a
+  // layout effect applies that caret position after the DOM has the new
+  // value committed, so there's exactly one writer of el.value (React).
+  const pendingSelection = useRef(null);
+
+  useLayoutEffect(() => {
+    const sel = pendingSelection.current;
+    if (sel && textareaRef.current) {
+      textareaRef.current.selectionStart = sel.start;
+      textareaRef.current.selectionEnd = sel.end;
+      pendingSelection.current = null;
+    }
+  }, [code]);
+
+  // Replaces the textarea's content and schedules the caret to land at
+  // [selStart, selEnd] once React has re-rendered with the new value.
+  function commit(next, selStart, selEnd, onChangeFn) {
+    pendingSelection.current = { start: selStart, end: selEnd ?? selStart };
+    onChangeFn(next);
+  }
+
   const handleKeyDown = (e) => {
     const el = e.target;
     const { value } = el;
@@ -62,7 +84,7 @@ export default function EditorPanel({
         }
 
         const next = before + newSelected + after;
-        commit(el, next, start + firstLineDelta, start + firstLineDelta + newSelected.length, onChange);
+        commit(next, start + firstLineDelta, start + firstLineDelta + newSelected.length, onChange);
         return;
       }
 
@@ -73,12 +95,12 @@ export default function EditorPanel({
         const removeCount = Math.min(4, leading.length);
         const next = value.slice(0, lineStart) + value.slice(lineStart + removeCount);
         const pos = start - removeCount;
-        commit(el, next, pos, pos, onChange);
+        commit(next, pos, pos, onChange);
         return;
       }
 
       const next = value.slice(0, start) + "    " + value.slice(end);
-      commit(el, next, start + 4, start + 4, onChange);
+      commit(next, start + 4, start + 4, onChange);
       return;
     }
 
@@ -100,7 +122,7 @@ export default function EditorPanel({
         const closingLine = "\n" + indent;
         const next = value.slice(0, start) + inner + closingLine + value.slice(end);
         const pos = start + inner.length;
-        commit(el, next, pos, pos, onChange);
+        commit(next, pos, pos, onChange);
         return;
       }
 
@@ -108,7 +130,7 @@ export default function EditorPanel({
       const insert = "\n" + indent + extra;
       const next = value.slice(0, start) + insert + value.slice(end);
       const pos = start + insert.length;
-      commit(el, next, pos, pos, onChange);
+      commit(next, pos, pos, onChange);
       return;
     }
 
@@ -128,14 +150,14 @@ export default function EditorPanel({
 
       e.preventDefault();
       const next = value.slice(0, start) + opener + closer + value.slice(end);
-      commit(el, next, start + 1, start + 1, onChange);
+      commit(next, start + 1, start + 1, onChange);
       return;
     }
 
     // Typing a closing char right before the same char already there: skip over it.
     if (CLOSERS.has(e.key) && start === end && value[start] === e.key) {
       e.preventDefault();
-      commit(el, value, start + 1, start + 1, onChange);
+      commit(value, start + 1, start + 1, onChange);
       return;
     }
 
@@ -146,7 +168,25 @@ export default function EditorPanel({
       if (PAIRS[charBefore] === charAfter) {
         e.preventDefault();
         const next = value.slice(0, start - 1) + value.slice(start + 1);
-        commit(el, next, start - 1, start - 1, onChange);
+        commit(next, start - 1, start - 1, onChange);
+        return;
+      }
+
+      // Backspace inside leading indentation: delete a full 4-space tab
+      // stop at once instead of a single space, so outdenting mirrors how
+      // Tab indents. Only kicks in when everything from the start of the
+      // line up to the cursor is spaces (i.e. we're still in the
+      // indentation, not deleting inside actual code).
+      const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+      const beforeCursor = value.slice(lineStart, start);
+      if (beforeCursor.length > 0 && /^ +$/.test(beforeCursor)) {
+        // Remove back to the previous multiple-of-4 column, capped by
+        // whatever whitespace is actually there.
+        const removeCount = beforeCursor.length % 4 === 0 ? 4 : beforeCursor.length % 4;
+        const clamped = Math.min(removeCount, beforeCursor.length);
+        e.preventDefault();
+        const next = value.slice(0, start - clamped) + value.slice(start);
+        commit(next, start - clamped, start - clamped, onChange);
         return;
       }
     }
@@ -164,6 +204,7 @@ export default function EditorPanel({
       </div>
 
       <textarea
+        ref={textareaRef}
         className="code-input"
         spellCheck={false}
         value={code}
