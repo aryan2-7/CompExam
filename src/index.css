@@ -391,6 +391,13 @@ body {
   resize: vertical;
   tab-size: 4;
   outline: none;
+  /* JetBrains Mono has ligatures on by default (<<, >>, ==, ->, etc. get
+     fused into a single glyph). In a code-input textarea that reads as a
+     dropped character, since e.g. "<<" visually renders as one symbol
+     until the cursor moves into it. Disable contextual alternates /
+     ligatures so every typed character stays visually distinct. */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
 }
 
 .code-input:focus { background: #101223; }
