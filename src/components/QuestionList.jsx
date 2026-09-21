@@ -1,6 +1,6 @@
 export default function QuestionList({ questions, currentId, solved, onSelect }) {
   if (questions.length === 0) {
-    return <p className="q-list-empty">no questions in this tab yet</p>;
+    return <p className="q-list-empty">no questions match this filter</p>;
   }
   return (
     <nav className="q-list" aria-label="questions">

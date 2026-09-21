@@ -1,8 +1,8 @@
 # CompExam.exe
 
-A C++ lab exam practice site. It provides a question bank with difficulty
-tabs, an in-browser code editor, and real C++ execution against hidden test
-cases.
+A C++ lab exam practice site. It provides a PYQ question bank with year and
+difficulty filters, an in-browser code editor, and real C++ execution against
+hidden test cases.
 
 Will be adding:
 - Questions from PYQs
@@ -14,7 +14,7 @@ Feel free to raise an issue for any feature request
 Live: **https://aryan2-7.github.io/CompLabPass/**
 
 ## Features
-- 20-question bank organized into All / Easy / Medium / Hard tabs
+- 28-question PYQ bank filterable by year and difficulty, with paper source badges and repeated-question tags
 - Runs each test case against your code and shows pass/fail per test
 - Animated pixel-art cat that reflects compile/run state (working, passed,
   failed, error) and falls asleep after inactivity
@@ -62,6 +62,6 @@ project and deploys `dist/` to GitHub Pages automatically.
 
 ## Project structure
     src/
-      components/   TopBar, DifficultyTabs, QuestionList, QuestionPanel, EditorPanel, Cat, Toast
+      components/   TopBar, FilterBar, QuestionList, QuestionPanel, EditorPanel, Cat, Toast
       data/         questions.js — question bank
       lib/          execute.js (execution API), storage.js (persistence)

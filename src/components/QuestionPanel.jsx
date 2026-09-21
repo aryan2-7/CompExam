@@ -11,9 +11,17 @@ export default function QuestionPanel({ question, index, onHintToggle, hintOpen 
     <section className="panel question-panel">
       <div className="panel-tab">QUESTION {String(index + 1).padStart(2, "0")}</div>
       <div className="panel-inner">
-        <span className={`diff-badge diff-${question.difficulty}`}>
-          {question.difficulty.toUpperCase()}
-        </span>
+        <div className="badge-row">
+          <span className={`diff-badge diff-${question.difficulty}`}>
+            {question.difficulty.toUpperCase()}
+          </span>
+          {(question.sources ?? (question.source ? [question.source] : [])).map((s) => (
+            <span key={s} className="source-badge">
+              {s}
+            </span>
+          ))}
+          {question.repeated && <span className="repeat-badge">REPEATED ×2</span>}
+        </div>
         <h1 className="q-title">{question.title}</h1>
 
         <p className="q-body">{inlineCode(question.body)}</p>

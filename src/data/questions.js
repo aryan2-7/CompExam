@@ -1,9 +1,11 @@
-// ============ QUESTION BANK ============
+// ============ QUESTION BANK (PYQs) ============
 // difficulty: "easy" | "medium" | "hard"
 // body/input/output/hint: plain text; wrap inline code in backticks `like this`.
-// starterCode is intentionally a minimal shell (just includes + main) so the
-// student writes the logic themselves; structural guidance lives in the hint.
+// starterCode is intentionally a minimal shell so the student writes the
+// logic themselves; structural guidance lives in the hint.
 // tests are what get executed. A question counts as completed when all pass.
+// source: original paper string; sources: split list; years: filterable years;
+// repeated: true when asked in multiple papers.
 
 const SHELL = `#include <iostream>
 using namespace std;
@@ -26,838 +28,1205 @@ int main() {
 
 export const QUESTIONS = [
   {
-    id: "even-odd",
-    title: "Even or Odd",
+    id: "inch-to-centimeter",
+    title: "Inch to Centimeter",
     difficulty: "easy",
+    source: "Jun/Jul 2024",
+    sources: ["Jun/Jul 2024"],
+    years: [2024],
+    repeated: false,
     body:
-      "Write a program that reads one integer `n` from standard input " +
-      "and prints `\"Even\"` if it's divisible by 2, or `\"Odd\"` otherwise.",
-    input: "A single line containing one integer `n` (can be negative).",
-    output: "Print exactly `Even` or `Odd`, no extra text.",
-    examples: [
-      { input: "4", output: "Even" },
-      { input: "7", output: "Odd" },
-    ],
-    starterCode: SHELL,
-    tests: [
-      { input: "4", expected: "Even" },
-      { input: "7", expected: "Odd" },
-      { input: "-8", expected: "Even" },
-    ],
-    hint:
-      "declare an int `n`, read it with `cin >> n`, then use the modulo " +
-      "operator `%`. what's the remainder of an even number divided by 2? " +
-      "print the matching word.",
-  },
-  {
-    id: "student-class-basics",
-    title: "Student Class Basics",
-    difficulty: "easy",
-    body:
-      "Create a class `Student` with public integer attributes `roll` and " +
-      "`marks`. Read these two integers from standard input, assign them to an " +
-      "instance of `Student`, and print the result formatted as " +
-      "`Roll: <roll>, Marks: <marks>`.",
-    input: "Two space-separated integers representing `roll` and `marks`.",
-    output: "A single string formatted as `Roll: <roll>, Marks: <marks>`.",
-    examples: [{ input: "10 85", output: "Roll: 10, Marks: 85" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "10 85", expected: "Roll: 10, Marks: 85" },
-      { input: "0 0", expected: "Roll: 0, Marks: 0" },
-      { input: "-5 100", expected: "Roll: -5, Marks: 100" },
-      { input: "42 999", expected: "Roll: 42, Marks: 999" },
-    ],
-    hint:
-      "define a class `Student` with public int members `roll` and `marks`. " +
-      "in main, create a Student object and read the two ints straight into " +
-      "`obj.roll` and `obj.marks`, then print `Roll: ` << obj.roll << `, ` << " +
-      "`Marks: ` << obj.marks.",
-  },
-  {
-    id: "complex-addition-overload",
-    title: "Overloading the Addition Operator",
-    difficulty: "medium",
-    body:
-      "Create a class `Complex` with integer attributes `real` and `imag`. " +
-      "Overload the `+` operator as a member function to add two `Complex` " +
-      "objects. Read four integers from standard input: the real and imaginary " +
-      "parts of the first number, followed by the real and imaginary parts of " +
-      "the second number. Print the resulting sum as `<real> + <imag>i`.",
-    input: "Four space-separated integers: `r1 i1 r2 i2`.",
-    output: "A single string formatted as `<real> + <imag>i`.",
-    examples: [{ input: "1 2 3 4", output: "4 + 6i" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "1 2 3 4", expected: "4 + 6i" },
-      { input: "-1 -2 1 2", expected: "0 + 0i" },
-      { input: "0 5 2 0", expected: "2 + 5i" },
-      { input: "-10 -20 -30 -40", expected: "-40 + -60i" },
-    ],
-    hint:
-      "define class `Complex` with public int `real` and `imag`. overload " +
-      "`operator+` as a member returning a new Complex whose real/imag are the " +
-      "sums of `this` and the argument. in main read the four ints into two " +
-      "Complex objects, add them, and print `result.real << \" + \" << " +
-      "result.imag << \"i\"`.",
-  },
-  {
-    id: "template-find-max",
-    title: "Generic Maximum Function",
-    difficulty: "easy",
-    body:
-      "Write a function template `findMax` that takes two arguments of the " +
-      "same type and returns the larger one. Read two integers from standard " +
-      "input, pass them to `findMax`, and print the result.",
-    input: "Two space-separated integers.",
-    output: "The larger of the two integers.",
-    examples: [
-      { input: "10 20", output: "20" },
-      { input: "-5 -10", output: "-5" },
-    ],
-    starterCode: SHELL,
-    tests: [
-      { input: "10 20", expected: "20" },
-      { input: "-5 -10", expected: "-5" },
-      { input: "0 0", expected: "0" },
-      { input: "42 7", expected: "42" },
-    ],
-    hint:
-      "write `template <typename T> T findMax(T a, T b)` returning `a > b ? " +
-      "a : b`. in main read two ints and print findMax(x, y).",
-  },
-  {
-    id: "safe-division-exception",
-    title: "Safe Division with Exceptions",
-    difficulty: "easy",
-    body:
-      "Write a program that reads two integers `a` and `b`. Calculate `a / b` " +
-      "using integer division. If `b` is `0`, `throw` an exception (an integer " +
-      "or `runtime_error`) and `catch` it to print `Division by zero error!`. " +
-      "Otherwise, print the division result.",
-    input: "Two space-separated integers `a` and `b`.",
+      "Write a C++ program that reads a length in inches and converts it to " +
+      "centimeters using `1 inch = 2.54 cm`.",
+    input: "One real number `x` (`0 <= x <= 10000`) on a single line.",
     output:
-      "The integer result of `a / b`, or `Division by zero error!` if `b` is " +
-      "zero.",
+      "Print exactly the length in centimeters, rounded to 2 decimal places, " +
+      "with nothing else.",
     examples: [
-      { input: "10 2", output: "5" },
-      { input: "10 0", output: "Division by zero error!" },
+      { input: "1", output: "2.54" },
+      { input: "10", output: "25.40" },
     ],
     starterCode: SHELL,
     tests: [
-      { input: "10 2", expected: "5" },
-      { input: "10 0", expected: "Division by zero error!" },
-      { input: "-15 3", expected: "-5" },
-      { input: "0 5", expected: "0" },
+      { input: "1", expected: "2.54" },
+      { input: "0", expected: "0.00" },
+      { input: "10", expected: "25.40" },
+      { input: "2.5", expected: "6.35" },
+      { input: "100", expected: "254.00" },
     ],
     hint:
-      "read a and b, then wrap the division in a try block. if `b == 0`, " +
-      "`throw` something; catch it and print `Division by zero error!`. " +
-      "otherwise cout the result of `a / b`.",
+      "Multiply by `2.54` and use `fixed` with `setprecision(2)` from " +
+      "`<iomanip>`.",
   },
   {
-    id: "shape-area-overloading",
-    title: "Shape Area Overloading",
+    id: "circle-class",
+    title: "Circle Class",
     difficulty: "easy",
+    source: "Jun/Jul 2024",
+    sources: ["Jun/Jul 2024"],
+    years: [2024],
+    repeated: false,
     body:
-      "Write two overloaded functions named `area`. One takes two integers " +
-      "(width and height of a rectangle) and returns `width * height`. The " +
-      "other takes a single integer (the side of a square) and returns " +
-      "`side * side`. Read three integers from standard input. Print the " +
-      "rectangle area (using the two-argument overload) on the first line, and " +
-      "the square area (using the one-argument overload) on the second line.",
-    input: "Three space-separated integers: `width height side`.",
-    output: "Two lines: the rectangle area, then the square area.",
-    examples: [{ input: "4 5 6", output: "20\n36" }],
+      "Define a class `Circle` with a private data member `radius` and the " +
+      "member functions `void setSize(float radius)`, `float getArea()` and " +
+      "`float getPerimeter()`. The area is `3.14159 * r * r` and the " +
+      "perimeter is `2 * 3.14159 * r`. Write a complete program that reads a " +
+      "radius, sets it with `setSize`, and prints the area and perimeter.",
+    input: "One real number `r` (`0 <= r <= 1000`).",
+    output:
+      "Print exactly two numbers separated by a single space: the area, then " +
+      "the perimeter, each rounded to 2 decimal places.",
+    examples: [
+      { input: "1", output: "3.14 6.28" },
+      { input: "2.5", output: "19.63 15.71" },
+    ],
     starterCode: SHELL,
     tests: [
-      { input: "4 5 6", expected: "20\n36" },
-      { input: "10 10 3", expected: "100\n9" },
-      { input: "0 10 2", expected: "0\n4" },
-      { input: "2 3 7", expected: "6\n49" },
+      { input: "1", expected: "3.14 6.28" },
+      { input: "0", expected: "0.00 0.00" },
+      { input: "2.5", expected: "19.63 15.71" },
+      { input: "10", expected: "314.16 62.83" },
+      { input: "0.5", expected: "0.79 3.14" },
     ],
     hint:
-      "write two overloads of `area`: `int area(int w, int h)` returning " +
-      "w * h, and `int area(int s)` returning s * s. in main read three ints " +
-      "and print area(w, h) then area(s), each on its own line — the compiler " +
-      "picks the right overload from the argument count.",
+      "Keep `radius` private, set it only through `setSize`, and format both " +
+      "values with `fixed` and `setprecision(2)`.",
   },
   {
-    id: "swap-using-references",
-    title: "Swap Numbers Using References",
-    difficulty: "easy",
-    body:
-      "Write a C++ program with a function `void swapNums(int& a, int& b)` " +
-      "that swaps two integers using reference variables (as taught in " +
-      "Lecture 2). Read two integers from standard input, call the `swapNums` " +
-      "function, and print the updated variables separated by a space.",
-    input: "Two space-separated integers.",
-    output: "The two integers swapped, separated by a space.",
-    examples: [{ input: "5 10", output: "10 5" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "5 10", expected: "10 5" },
-      { input: "-100 200", expected: "200 -100" },
-      { input: "0 0", expected: "0 0" },
-      { input: "42 42", expected: "42 42" },
-    ],
-    hint:
-      "write `void swapNums(int& a, int& b)` that swaps using a temp " +
-      "variable. in main read x and y, call swapNums(x, y), then print x and " +
-      "y separated by a space.",
-  },
-  {
-    id: "student-static-count",
-    title: "Keep Track of Objects with Static Members",
+    id: "circle-constructor-overloading",
+    title: "Circle Area and Circumference by Constructor Overloading",
     difficulty: "medium",
+    source: "Mar/Apr 2017",
+    sources: ["Mar/Apr 2017"],
+    years: [2017],
+    repeated: false,
     body:
-      "Create a class `Student` with private variables `name` (string) and " +
-      "`roll` (int). Include a static data member `count` to keep track of the " +
-      "total number of student objects created, and a static member function " +
-      "`getCount()` to return it (as required in Lecture 3). Read an integer " +
-      "`n`. Then loop `n` times, reading a string and an integer each time to " +
-      "create a `Student` object. Finally, print the total count using the " +
-      "static member function.",
+      "Write a program using constructor overloading to compute a circle's " +
+      "area and circumference. Provide a default constructor (radius `1`), a " +
+      "constructor taking a radius, and a constructor taking a diameter flag. " +
+      "The program reads a mode `m` and a value `v`: if `m` is `0` the object " +
+      "is built with the default constructor and `v` is ignored, if `m` is " +
+      "`1` it is built from radius `v`, and if `m` is `2` it is built from " +
+      "diameter `v` (radius is `v / 2`). Use `3.14159` for pi.",
     input:
-      "An integer `n` followed by `n` pairs of `<string> <integer>`.",
-    output: "A single integer representing the total count of created students.",
-    examples: [{ input: "3 Alice 1 Bob 2 Charlie 3", output: "3" }],
-    starterCode: SHELL_STRING,
+      "Two numbers on one line: integer `m` in `{0, 1, 2}` and real `v` " +
+      "(`0 <= v <= 1000`).",
+    output:
+      "Print exactly the area and the circumference separated by a single " +
+      "space, each rounded to 2 decimal places.",
+    examples: [
+      { input: "0 99", output: "3.14 6.28" },
+      { input: "2 4", output: "12.57 12.57" },
+    ],
+    starterCode: SHELL,
     tests: [
-      { input: "3 Alice 1 Bob 2 Charlie 3", expected: "3" },
-      { input: "0", expected: "0" },
-      { input: "1 Dave 99", expected: "1" },
-      { input: "5 A 1 B 2 C 3 D 4 E 5", expected: "5" },
+      { input: "0 99", expected: "3.14 6.28" },
+      { input: "1 2.5", expected: "19.63 15.71" },
+      { input: "2 4", expected: "12.57 12.57" },
+      { input: "1 0", expected: "0.00 0.00" },
+      { input: "2 10", expected: "78.54 31.42" },
     ],
     hint:
-      "add `static int count;` inside the class and increment it in every " +
-      "constructor, plus `static int getCount()`. define `int " +
-      "Student::count = 0;` outside the class. in main read n, loop n times " +
-      "reading a string and int and constructing a Student each time, then " +
-      "print Student::getCount().",
+      "Three constructors with different parameter lists let the compiler " +
+      "pick the right one; compute area and circumference in member functions.",
   },
   {
-    id: "constructor-destructor-order",
-    title: "Constructor and Destructor Execution Order",
+    id: "complex-multiplication",
+    title: "Complex Number Multiplication",
     difficulty: "medium",
+    source: "Mar/Apr 2017",
+    sources: ["Mar/Apr 2017"],
+    years: [2017],
+    repeated: false,
     body:
-      "Write a class `Test` with a private integer `id`. The constructor " +
-      "should take an integer, assign it to `id`, and print `Constructed <id>`. " +
-      "The destructor should print `Destroyed <id>`. In `main`, read 3 " +
-      "integers. Create 3 local `Test` objects in sequence within a block scope " +
-      "(so they get destroyed automatically). Verify that the execution of " +
-      "destructors is in the reverse order of the constructors (Lecture 4 Try " +
-      "it!).",
-    input: "Three space-separated integers.",
+      "Write a program that multiplies two complex numbers using operator " +
+      "overloading. Define a class `Complex` with `real` and `imag` parts and " +
+      "overload `operator*` so that `(a + bi) * (c + di) = (ac - bd) + " +
+      "(ad + bc)i`.",
+    input:
+      "Four integers `a b c d` on one line (`-1000 <= a, b, c, d <= 1000`).",
     output:
-      "Six lines: three construction messages followed by three destruction " +
-      "messages.",
+      "Print exactly the product as `real imag`, separated by a single space.",
+    examples: [
+      { input: "1 2 3 4", output: "-5 10" },
+      { input: "2 0 0 3", output: "0 6" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "1 2 3 4", expected: "-5 10" },
+      { input: "0 0 5 6", expected: "0 0" },
+      { input: "-1 -1 -1 1", expected: "2 0" },
+      { input: "2 0 0 3", expected: "0 6" },
+      { input: "1 0 1 0", expected: "1 0" },
+    ],
+    hint:
+      "Return a new `Complex` from `operator*` built from the two formulas; " +
+      "don't modify either operand.",
+  },
+  {
+    id: "province-array-objects",
+    title: "Province Array of Objects",
+    difficulty: "easy",
+    source: "Aug 2019",
+    sources: ["Aug 2019"],
+    years: [2019],
+    repeated: false,
+    body:
+      "Create a class `Province` with `name`, `area` (sq km) and `population`. " +
+      "Read the information of exactly seven provinces into an array of " +
+      "objects and display each one.",
+    input:
+      "Seven lines, each with `name area population`, where `name` is a " +
+      "single word (use `_` instead of spaces), `area` and `population` are " +
+      "integers.",
+    output:
+      "Print exactly seven blocks in the order read, each block is three " +
+      "lines: `Province name: <name>`, then `Area: <area> sq km`, then " +
+      "`Population: <population>` (21 lines total).",
     examples: [
       {
-        input: "10 20 30",
+        input: "S1 100 1000\nS2 200 2000\nS3 300 3000\nS4 400 4000\nS5 500 5000\nS6 600 6000\nS7 700 7000",
         output:
-          "Constructed 10\nConstructed 20\nConstructed 30\nDestroyed 30\nDestroyed 20\nDestroyed 10",
+          "Province name: S1\nArea: 100 sq km\nPopulation: 1000",
       },
     ],
-    starterCode: SHELL,
+    starterCode: SHELL_STRING,
     tests: [
       {
-        input: "10 20 30",
+        input: "S1 1 1\nS1 1 1\nS1 1 1\nS1 1 1\nS1 1 1\nS1 1 1\nS1 1 1",
         expected:
-          "Constructed 10\nConstructed 20\nConstructed 30\nDestroyed 30\nDestroyed 20\nDestroyed 10",
+          "Province name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1\nProvince name: S1\nArea: 1 sq km\nPopulation: 1",
       },
       {
-        input: "1 2 3",
+        input: "S1 100 1000\nS2 200 2000\nS3 300 3000\nS4 400 4000\nS5 500 5000\nS6 600 6000\nS7 700 7000",
         expected:
-          "Constructed 1\nConstructed 2\nConstructed 3\nDestroyed 3\nDestroyed 2\nDestroyed 1",
+          "Province name: S1\nArea: 100 sq km\nPopulation: 1000\nProvince name: S2\nArea: 200 sq km\nPopulation: 2000\nProvince name: S3\nArea: 300 sq km\nPopulation: 3000\nProvince name: S4\nArea: 400 sq km\nPopulation: 4000\nProvince name: S5\nArea: 500 sq km\nPopulation: 5000\nProvince name: S6\nArea: 600 sq km\nPopulation: 6000\nProvince name: S7\nArea: 700 sq km\nPopulation: 7000",
       },
       {
-        input: "-5 0 5",
+        input: "Z1 0 0\nZ2 0 0\nZ3 0 0\nZ4 0 0\nZ5 0 0\nZ6 0 0\nZ7 0 0",
         expected:
-          "Constructed -5\nConstructed 0\nConstructed 5\nDestroyed 5\nDestroyed 0\nDestroyed -5",
+          "Province name: Z1\nArea: 0 sq km\nPopulation: 0\nProvince name: Z2\nArea: 0 sq km\nPopulation: 0\nProvince name: Z3\nArea: 0 sq km\nPopulation: 0\nProvince name: Z4\nArea: 0 sq km\nPopulation: 0\nProvince name: Z5\nArea: 0 sq km\nPopulation: 0\nProvince name: Z6\nArea: 0 sq km\nPopulation: 0\nProvince name: Z7\nArea: 0 sq km\nPopulation: 0",
+      },
+      {
+        input: "A1 10 100\nA2 20 200\nState_3 20304 5529452\nA4 40 400\nA5 50 500\nA6 60 600\nA7 70 700",
+        expected:
+          "Province name: A1\nArea: 10 sq km\nPopulation: 100\nProvince name: A2\nArea: 20 sq km\nPopulation: 200\nProvince name: State_3\nArea: 20304 sq km\nPopulation: 5529452\nProvince name: A4\nArea: 40 sq km\nPopulation: 400\nProvince name: A5\nArea: 50 sq km\nPopulation: 500\nProvince name: A6\nArea: 60 sq km\nPopulation: 600\nProvince name: A7\nArea: 70 sq km\nPopulation: 700",
       },
     ],
     hint:
-      "class `Test` has private int `id`; the constructor stores id and prints " +
-      "`Constructed <id>`; the destructor prints `Destroyed <id>`. in main read " +
-      "a, b, c and create three Test objects in order — they're destroyed " +
-      "automatically in reverse order at the end of main.",
+      "Use `Province p[7]` with a `read()` and a `display()` member function, " +
+      "and loop over the array.",
   },
   {
-    id: "complex-operator-overloading",
-    title: "Complex Number IO and Addition Overloading",
-    difficulty: "hard",
+    id: "inline-area-overload",
+    title: "Inline Overloaded Area Functions",
+    difficulty: "easy",
+    source: "Aug 2019",
+    sources: ["Aug 2019"],
+    years: [2019],
+    repeated: false,
     body:
-      "Create a class `Complex` with integers `real` and `imag`. Overload the " +
-      "binary `+` operator to add two complex numbers. Also, overload the `<<` " +
-      "insertion operator using a friend function to print the complex number " +
-      "in the format `a + bi` (if `b` is positive/zero) or `a - bi` (if `b` is " +
-      "negative, printing the absolute value of `b`). Read four integers from " +
-      "standard input (`real1`, `imag1`, `real2`, `imag2`), add the two " +
-      "resulting complex numbers, and print the sum using `cout <<` " +
-      "(Lecture 5).",
-    input: "Four space-separated integers.",
-    output: "A single string representing the complex sum.",
-    examples: [{ input: "1 2 3 -4", output: "4 - 2i" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "1 2 3 -4", expected: "4 - 2i" },
-      { input: "5 5 5 5", expected: "10 + 10i" },
-      { input: "0 0 0 0", expected: "0 + 0i" },
-      { input: "-10 -20 5 10", expected: "-5 - 10i" },
-      { input: "2 -3 -2 3", expected: "0 + 0i" },
-    ],
-    hint:
-      "in Complex, overload `operator+` as a member returning a new Complex " +
-      "with summed real/imag. overload `<<` as a `friend ostream& " +
-      "operator<<(ostream&, const Complex&)`: print real, then if imag < 0 " +
-      "print ` - ` and abs(imag), else ` + ` and imag, then `i`. in main read " +
-      "four ints, add the two Complex objects, `cout << sum`.",
-  },
-  {
-    id: "virtual-base-diamond-problem",
-    title: "Solve Diamond Problem with Virtual Base Class",
-    difficulty: "hard",
-    body:
-      "Implement a class hierarchy to resolve the diamond problem (Lecture 6 " +
-      "Try it!). Create a base class `Person` with `name` (string) and `code` " +
-      "(int). Derive classes `Account` (with `pay` float) and `Admin` (with " +
-      "`experience` int) using virtual inheritance from `Person`. Create a " +
-      "class `Master` that derives from both `Account` and `Admin`. Provide a " +
-      "function in `Master` to display the information. Read a string and three " +
-      "numbers (`name`, `code`, `pay`, `experience`). Create a `Master` object " +
-      "and display its data in exactly this format: `Name: <name>, Code: " +
-      "<code>, Pay: <pay>, Exp: <experience>`.",
+      "Define two `inline` functions with the same name `area` (function " +
+      "overloading): `area(float R)` returns the area of a circle " +
+      "(`3.14 * R * R`), and `area(float L, float B)` returns the area of a " +
+      "rectangle (`L * B`). The program reads a shape code and the needed " +
+      "values, then prints the area.",
     input:
-      "A string `name`, followed by `code` (int), `pay` (float), and " +
-      "`experience` (int).",
-    output: "A single formatted string with the person's details.",
+      "First an integer `t` (`1` = circle, `2` = rectangle). If `t = 1`, one " +
+      "real number `R` follows. If `t = 2`, two real numbers `L B` follow.",
+    output: "Print exactly the area rounded to 2 decimal places.",
     examples: [
-      { input: "John 101 5000 5", output: "Name: John, Code: 101, Pay: 5000, Exp: 5" },
-    ],
-    starterCode: SHELL_STRING,
-    tests: [
-      { input: "John 101 5000 5", expected: "Name: John, Code: 101, Pay: 5000, Exp: 5" },
-      { input: "Alice 202 7500.5 10", expected: "Name: Alice, Code: 202, Pay: 7500.5, Exp: 10" },
-      { input: "Bob 99 0 0", expected: "Name: Bob, Code: 99, Pay: 0, Exp: 0" },
-    ],
-    hint:
-      "Person has protected string `name` and int `code`. `class Account : " +
-      "virtual public Person` adds float pay; `class Admin : virtual public " +
-      "Person` adds int experience; `class Master : public Account, public " +
-      "Admin` has a display() printing `Name: <name>, Code: <code>, Pay: " +
-      "<pay>, Exp: <experience>`. the `virtual` keyword avoids two copies of " +
-      "Person. in main construct Master with all four values and call display.",
-  },
-  {
-    id: "abstract-class-array-pointers",
-    title: "Abstract Class and Array of Pointers (💀)",
-    difficulty: "hard",
-    body:
-      "Create an abstract class `Student` with a pure virtual function " +
-      "`displayStream()` (Lecture 7 Try it!). Derive three classes: " +
-      "`Engineering`, `Science`, and `Medical`. Their `displayStream()` " +
-      "functions should print `Engineering Student`, `Science Student`, and " +
-      "`Medical Student` respectively. Read an integer `n` (number of queries). " +
-      "For the next `n` inputs, read an integer (1 for Engineering, 2 for " +
-      "Science, 3 for Medical). Store dynamically allocated derived objects " +
-      "in an array of `Student*` pointers, then iterate through the array to " +
-      "call `displayStream()` for each. Output each stream on a new line.",
-    input: "An integer `n`, followed by `n` integers (each 1, 2, or 3).",
-    output: "`n` lines describing the stream of each student.",
-    examples: [
-      {
-        input: "3 1 3 2",
-        output: "Engineering Student\nMedical Student\nScience Student",
-      },
+      { input: "1 2", output: "12.56" },
+      { input: "2 3 4", output: "12.00" },
     ],
     starterCode: SHELL,
     tests: [
+      { input: "1 2", expected: "12.56" },
+      { input: "2 3 4", expected: "12.00" },
+      { input: "1 0", expected: "0.00" },
+      { input: "2 0 5", expected: "0.00" },
+      { input: "2 2.5 4", expected: "10.00" },
+    ],
+    hint:
+      "Mark both functions `inline` and let the number of arguments choose " +
+      "the overload.",
+  },
+  {
+    id: "length-class-addition",
+    title: "Length Class Addition",
+    difficulty: "medium",
+    source: "Aug 2019",
+    sources: ["Aug 2019"],
+    years: [2019],
+    repeated: false,
+    body:
+      "Define a class `Length` with data members `feet` and `inches`, with " +
+      "appropriate constructors, and overload `operator+` to add two `Length` " +
+      "objects. Carry over correctly using `12 inches = 1 foot`. For example " +
+      "`2 ft 9 in + 3 ft 9 in = 6 ft 6 in`.",
+    input:
+      "Four integers `f1 i1 f2 i2` on one line (`0 <= i1, i2 < 12`, " +
+      "`0 <= f1, f2 <= 1000`).",
+    output:
+      "Print exactly `<feet> <inches>` for the sum, separated by a single " +
+      "space, with `inches` in `0..11`.",
+    examples: [
+      { input: "2 9 3 9", output: "6 6" },
+      { input: "1 11 0 1", output: "2 0" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "2 9 3 9", expected: "6 6" },
+      { input: "0 0 0 0", expected: "0 0" },
+      { input: "1 11 0 1", expected: "2 0" },
+      { input: "5 6 4 6", expected: "10 0" },
+      { input: "0 5 0 4", expected: "0 9" },
+    ],
+    hint:
+      "Add feet and inches separately, then move `inches / 12` into feet and " +
+      "keep `inches % 12`.",
+  },
+  {
+    id: "alphabet-digit-exception",
+    title: "Alphabet or Digit Exception",
+    difficulty: "medium",
+    source: "Aug 2019",
+    sources: ["Aug 2019"],
+    years: [2019],
+    repeated: false,
+    body:
+      "Write a program that reads a single character. Use exception handling: " +
+      "if the character is alphabetic, print the welcome message; if it is a " +
+      "numeric character, throw an exception and print the error message from " +
+      "the `catch` block.",
+    input: "One character `c` (a letter `a-z`/`A-Z` or a digit `0-9`).",
+    output:
+      "Print exactly `Welcome` if `c` is alphabetic, otherwise print exactly " +
+      "`Error`.",
+    examples: [
+      { input: "a", output: "Welcome" },
+      { input: "7", output: "Error" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "a", expected: "Welcome" },
+      { input: "Z", expected: "Welcome" },
+      { input: "7", expected: "Error" },
+      { input: "0", expected: "Error" },
+      { input: "m", expected: "Welcome" },
+    ],
+    hint:
+      "Use `isdigit`/`isalpha`, `throw` inside a `try` when a digit is found, " +
+      "and print the messages from the appropriate branch.",
+  },
+  {
+    id: "counter-increment-overload",
+    title: "Postfix and Prefix Increment Overloading",
+    difficulty: "medium",
+    source: "May/Jun 2022, Jan 2025",
+    sources: ["May/Jun 2022", "Jan 2025"],
+    years: [2022, 2025],
+    repeated: true,
+    body:
+      "Define a class `Counter` holding an integer, overload prefix `++c` " +
+      "(increments then returns) and postfix `c++` (returns the old value " +
+      "then increments, with the dummy `int` parameter). In May/Jun 2022 the " +
+      "postfix version was required as a friend function. The program reads " +
+      "`n`, creates `Counter c(n)`, then prints the results in order of " +
+      "`++c`, then `c++`, then the final value of `c`.",
+    input: "One integer `n` (`-1000 <= n <= 1000`).",
+    output:
+      "Print exactly three integers separated by single spaces: the value " +
+      "returned by `++c`, the value returned by `c++`, and the final value " +
+      "of `c`.",
+    examples: [
+      { input: "5", output: "6 6 7" },
+      { input: "0", output: "1 1 2" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "5", expected: "6 6 7" },
+      { input: "0", expected: "1 1 2" },
+      { input: "-1", expected: "0 0 1" },
+      { input: "-5", expected: "-4 -4 -3" },
+      { input: "999", expected: "1000 1000 1001" },
+    ],
+    hint:
+      "Prefix takes no parameter and returns the updated object; postfix " +
+      "takes a dummy `int`, saves a copy, increments, and returns the copy.",
+  },
+  {
+    id: "stats-template-largest-average",
+    title: "Class Template Largest and Average",
+    difficulty: "hard",
+    source: "May/Jun 2022",
+    sources: ["May/Jun 2022"],
+    years: [2022],
+    repeated: false,
+    body:
+      "Write a class template `Stats<T>` that stores an array of elements and " +
+      "can display the largest value and the average value of the stored " +
+      "elements. The program reads `n` integers, stores them in a " +
+      "`Stats<int>`, and prints the largest and the average.",
+    input:
+      "First line `n` (`1 <= n <= 100`). Second line `n` integers " +
+      "(`-10000 <= a[i] <= 10000`).",
+    output:
+      "Print exactly the largest value and the average (rounded to 2 decimal " +
+      "places) separated by a single space.",
+    examples: [
+      { input: "3\n1 2 3", output: "3 2.00" },
+      { input: "4\n-1 -2 -3 -4", output: "-1 -2.50" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "3\n1 2 3", expected: "3 2.00" },
+      { input: "1\n7", expected: "7 7.00" },
+      { input: "4\n-1 -2 -3 -4", expected: "-1 -2.50" },
+      { input: "3\n0 0 0", expected: "0 0.00" },
+      { input: "5\n10 20 30 40 50", expected: "50 30.00" },
+    ],
+    hint:
+      "Declare `template <class T> class Stats`, keep a `T` array and its " +
+      "size, and compute the average as a floating-point division.",
+  },
+  {
+    id: "template-sort-average",
+    title: "Class Template Sort and Average",
+    difficulty: "hard",
+    source: "Apr/May 2023",
+    sources: ["Apr/May 2023"],
+    years: [2023],
+    repeated: false,
+    body:
+      "Write a class template that sorts the values stored in an array and " +
+      "returns their average. The program reads `n` integers, stores them in " +
+      "the template class, sorts them ascending and prints them, then prints " +
+      "their average.",
+    input:
+      "First line `n` (`1 <= n <= 100`). Second line `n` integers " +
+      "(`-10000 <= a[i] <= 10000`).",
+    output:
+      "Print exactly two lines. Line 1: the sorted values separated by " +
+      "single spaces. Line 2: the average rounded to 2 decimal places.",
+    examples: [
+      { input: "3\n3 1 2", output: "1 2 3\n2.00" },
+      { input: "4\n-1 5 0 2", output: "-1 0 2 5\n1.50" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "3\n3 1 2", expected: "1 2 3\n2.00" },
+      { input: "1\n9", expected: "9\n9.00" },
+      { input: "4\n-1 5 0 2", expected: "-1 0 2 5\n1.50" },
+      { input: "3\n5 5 5", expected: "5 5 5\n5.00" },
+      { input: "5\n10 -10 20 -20 0", expected: "-20 -10 0 10 20\n0.00" },
+    ],
+    hint:
+      "Implement a simple bubble sort inside a member function of `template " +
+      "<class T>` and compute the average using a `double` sum.",
+  },
+  {
+    id: "restaurant-bill-polymorphism",
+    title: "Restaurant Bill with Runtime Polymorphism",
+    difficulty: "hard",
+    source: "May/Jun 2022",
+    sources: ["May/Jun 2022"],
+    years: [2022],
+    repeated: false,
+    body:
+      "Deal with food orders and compute the bill. Class `Food` has `DishName` " +
+      "(string) and `Price` (int). Class `TableInfo` has a unique integer " +
+      "`TableNo` and a `Menu` array of `Food`. Class `BillAmount` derives " +
+      "from `TableInfo` and has `NetAmt` (sum of dish prices), `VAT` (13% of " +
+      "`NetAmt`), `ServiceCharge` (10% of `NetAmt`) and `GrossAmt = NetAmt + " +
+      "VAT + ServiceCharge`. Store customers for 5 tables and use runtime " +
+      "polymorphism (a virtual `display` through a base pointer) to print " +
+      "each table's bill.",
+    input:
+      "For each of 5 tables: a line with `TableNo k`, then `k` lines each " +
+      "`DishName Price` (`DishName` a single word, `Price` an integer, " +
+      "`1 <= k <= 10`).",
+    output:
+      "Print exactly one line per table, in input order: `Table <no>: " +
+      "NetAmt=<x> VAT=<y> ServiceCharge=<z> GrossAmt=<w>` with every amount " +
+      "rounded to 2 decimal places.",
+    examples: [
       {
-        input: "3 1 3 2",
-        expected: "Engineering Student\nMedical Student\nScience Student",
+        input: "1 3\nMomo 250\nChowmein 150\nTea 100\n2 1\nRice 200\n3 1\nBurger 150\n4 2\nPizza 300\nCoke 50\n5 1\nCoffee 80",
+        output:
+          "Table 1: NetAmt=500.00 VAT=65.00 ServiceCharge=50.00 GrossAmt=615.00",
       },
-      { input: "1 3", expected: "Medical Student" },
+    ],
+    starterCode: SHELL_STRING,
+    tests: [
       {
-        input: "4 1 1 2 2",
+        input: "1 3\nMomo 250\nChowmein 150\nTea 100\n2 1\nRice 200\n3 1\nBurger 150\n4 2\nPizza 300\nCoke 50\n5 1\nCoffee 80",
         expected:
-          "Engineering Student\nEngineering Student\nScience Student\nScience Student",
+          "Table 1: NetAmt=500.00 VAT=65.00 ServiceCharge=50.00 GrossAmt=615.00\nTable 2: NetAmt=200.00 VAT=26.00 ServiceCharge=20.00 GrossAmt=246.00\nTable 3: NetAmt=150.00 VAT=19.50 ServiceCharge=15.00 GrossAmt=184.50\nTable 4: NetAmt=350.00 VAT=45.50 ServiceCharge=35.00 GrossAmt=430.50\nTable 5: NetAmt=80.00 VAT=10.40 ServiceCharge=8.00 GrossAmt=98.40",
       },
-      { input: "0", expected: "" },
+      {
+        input: "1 1\nDal 1000\n2 1\nRice 100\n3 1\nBurger 100\n4 1\nPizza 100\n5 1\nTea 100",
+        expected:
+          "Table 1: NetAmt=1000.00 VAT=130.00 ServiceCharge=100.00 GrossAmt=1230.00\nTable 2: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 3: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 4: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 5: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00",
+      },
+      {
+        input: "1 1\nMomo 99\n2 1\nRice 100\n3 1\nBurger 100\n4 1\nPizza 100\n5 1\nTea 100",
+        expected:
+          "Table 1: NetAmt=99.00 VAT=12.87 ServiceCharge=9.90 GrossAmt=121.77\nTable 2: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 3: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 4: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 5: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00",
+      },
+      {
+        input: "1 1\nTea 1\n2 1\nRice 100\n3 1\nBurger 100\n4 1\nPizza 100\n5 1\nCoffee 100",
+        expected:
+          "Table 1: NetAmt=1.00 VAT=0.13 ServiceCharge=0.10 GrossAmt=1.23\nTable 2: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 3: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 4: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00\nTable 5: NetAmt=100.00 VAT=13.00 ServiceCharge=10.00 GrossAmt=123.00",
+      },
     ],
     hint:
-      "derive Engineering, Science, Medical from `Student` and override " +
-      "displayStream to print the matching text. in main, `Student** arr = " +
-      "new Student*[n];`, loop reading each integer and `arr[i] = new " +
-      "Engineering()` (etc.), then loop calling `arr[i]->displayStream()` and `delete " +
-      "arr[i]`, finally `delete[] arr`.",
+      "Give the base class a `virtual void display()`, keep an array of base " +
+      "pointers to the 5 `BillAmount` objects, and call `display()` through " +
+      "each pointer.",
   },
   {
-    id: "class-template-array-sort-avg",
-    title: "Class Template for Array Sort and Average",
-    difficulty: "hard",
+    id: "everest-friend-subtraction",
+    title: "Mount Everest Height with Friend Subtraction",
+    difficulty: "medium",
+    source: "May/Jun 2022",
+    sources: ["May/Jun 2022"],
+    years: [2022],
+    repeated: false,
     body:
-      "Write a class template (Lecture 8) that holds an array of 5 elements of " +
-      "generic type `T`. It should have methods `sortArray()` to sort the " +
-      "elements in ascending order and `getAverage()` to return the average of " +
-      "the elements as a double. Read 5 doubles from standard input. Instantiate " +
-      "the template with `double`, populate the array, sort it, print the " +
-      "sorted array space-separated on one line, and print the average on the " +
-      "next line.",
-    input: "Five numbers (doubles).",
+      "Write a class that stores a height in meters and centimeters, " +
+      "initialized through a parameterized constructor. Create `MtEverest` " +
+      "and `BaseCamp`, then compute `HeightfromBaseCamp` by overloading " +
+      "`operator-` as a friend function so that `HeightfromBaseCamp = " +
+      "MtEverest - BaseCamp`. Borrow correctly when centimeters go negative " +
+      "(`100 cm = 1 m`).",
+    input:
+      "Four integers `m1 c1 m2 c2` on one line, where `m1 c1` is `MtEverest` " +
+      "and `m2 c2` is `BaseCamp` (`0 <= c1, c2 < 100`, `MtEverest >= " +
+      "BaseCamp`).",
     output:
-      "Two lines: the sorted space-separated array, and the computed average.",
-    examples: [{ input: "5 3 4 1 2", output: "1 2 3 4 5\n3" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "5 3 4 1 2", expected: "1 2 3 4 5\n3" },
-      { input: "5.5 1.1 4.4 2.2 3.3", expected: "1.1 2.2 3.3 4.4 5.5\n3.3" },
-      { input: "10 10 10 10 10", expected: "10 10 10 10 10\n10" },
-      { input: "-1.5 0 2.5 -3.5 5", expected: "-3.5 -1.5 0 2.5 5\n0.5" },
-    ],
-    hint:
-      "write `template <typename T> class ...` holding `T arr[5]`. " +
-      "sortArray() can use `std::sort` (add `#include <algorithm>`, and note " +
-      "the shell only has <iostream>). getAverage() returns `(double)sum / 5`. " +
-      "in main read 5 doubles into the array, sort, print space-separated, " +
-      "then the average on a new line.",
-  },
-  {
-    id: "inline-function-cube",
-    title: "Inline Function for Cube Calculation",
-    difficulty: "easy",
-    body:
-      "Write an `inline` function named `cube` that takes an integer `n` and " +
-      "returns its cube. Read an integer from standard input, pass it to your " +
-      "inline function, and print the result. This demonstrates how small, " +
-      "frequently called functions can be optimized by the compiler (Lecture " +
-      "2).",
-    input: "A single integer `n`.",
-    output: "A single integer representing `n * n * n`.",
-    examples: [{ input: "3", output: "27" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "3", expected: "27" },
-      { input: "-4", expected: "-64" },
-      { input: "0", expected: "0" },
-      { input: "10", expected: "1000" },
-    ],
-    hint:
-      "write `inline int cube(int n) { return n * n * n; }` above main. in " +
-      "main read an int and print cube(n).",
-  },
-  {
-    id: "function-overloading-area",
-    title: "Function Overloading for Area",
-    difficulty: "easy",
-    body:
-      "Write two overloaded functions named `calculateArea`. One takes a " +
-      "single `double` (radius of a circle) and returns its area (use `3.14 * " +
-      "radius * radius`). The other takes two `double`s (length and width of a " +
-      "rectangle) and returns its area. Read three doubles from standard input: " +
-      "`radius length width`. Print the circle area on the first line and the " +
-      "rectangle area on the second line.",
-    input: "Three space-separated doubles: `radius length width`.",
-    output: "Two lines: the circle area, then the rectangle area.",
-    examples: [{ input: "5.0 4.0 5.0", output: "78.5\n20" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "5.0 4.0 5.0", expected: "78.5\n20" },
-      { input: "10.0 2.5 4.0", expected: "314\n10" },
-      { input: "0.0 2.0 3.0", expected: "0\n6" },
-      { input: "1.0 10.0 10.0", expected: "3.14\n100" },
-    ],
-    hint:
-      "write two overloads of calculateArea: one taking a single double " +
-      "radius returning `3.14 * radius * radius`, and one taking two doubles " +
-      "returning length * width. in main read the three doubles, then print " +
-      "calculateArea(radius) and calculateArea(length, width) each on its own " +
-      "line — the compiler picks the overload by argument count.",
-  },
-  {
-    id: "copy-constructor-point",
-    title: "Demonstrate the Copy Constructor",
-    difficulty: "medium",
-    body:
-      "Create a class `Point` with public integers `x` and `y`. Provide a " +
-      "parameterized constructor `Point(int x, int y)` and a custom copy " +
-      "constructor `Point(const Point &p)`. Read two integers to create the " +
-      "first `Point` object `p1`. Create a second object `p2` using the copy " +
-      "constructor on `p1`. Then read two more integers and add them to `p2`'s " +
-      "`x` and `y` respectively. Print both points on separate lines in the " +
-      "format `(x, y)` to prove that `p1` was unaffected by the changes to " +
-      "`p2`.",
-    input: "Four space-separated integers: `x1 y1 dx dy`.",
-    output: "Two lines formatted as `(x, y)`.",
+      "Print exactly `<meters> <centimeters>` of the difference, with " +
+      "centimeters in `0..99`.",
     examples: [
-      { input: "10 20 5 -5", output: "(10, 20)\n(15, 15)" },
+      { input: "8848 86 5364 0", output: "3484 86" },
+      { input: "5 50 2 75", output: "2 75" },
     ],
     starterCode: SHELL,
     tests: [
-      { input: "10 20 5 -5", expected: "(10, 20)\n(15, 15)" },
-      { input: "0 0 100 100", expected: "(0, 0)\n(100, 100)" },
-      { input: "-5 -10 5 10", expected: "(-5, -10)\n(0, 0)" },
+      { input: "8848 86 5364 0", expected: "3484 86" },
+      { input: "10 0 10 0", expected: "0 0" },
+      { input: "5 50 2 75", expected: "2 75" },
+      { input: "100 0 0 1", expected: "99 99" },
+      { input: "3 20 3 5", expected: "0 15" },
     ],
     hint:
-      "class `Point` has public int x, y; a parameterized constructor setting " +
-      "both, and a copy constructor `Point(const Point& p)` copying x and y. " +
-      "in main read `x1 y1 dx dy`, create `Point p1(x1, y1)`, then `Point p2 " +
-      "(p1)`, add dx to p2.x and dy to p2.y, print both as `(x, y)` on separate " +
-      "lines.",
+      "Convert both heights to total centimeters, subtract, then split the " +
+      "result into `total / 100` and `total % 100`.",
   },
   {
-    id: "unary-operator-negation",
-    title: "Overload Unary Minus Operator",
+    id: "static-object-counter",
+    title: "Static Object Counter",
     difficulty: "easy",
+    source: "Aug 2018, Apr/May 2023",
+    sources: ["Aug 2018", "Apr/May 2023"],
+    years: [2018, 2023],
+    repeated: true,
     body:
-      "Create a class `Vector3D` with integers `x`, `y`, and `z`. Overload the " +
-      "unary `-` operator as a member function to negate all three coordinates. " +
-      "Read three integers from standard input to initialize the vector, apply " +
-      "the unary minus operator, and print the resulting coordinates separated " +
-      "by spaces.",
-    input: "Three space-separated integers.",
-    output: "The three negated integers, separated by spaces.",
-    examples: [{ input: "5 -3 0", output: "-5 3 0" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "5 -3 0", expected: "-5 3 0" },
-      { input: "10 20 30", expected: "-10 -20 -30" },
-      { input: "-1 -2 -3", expected: "1 2 3" },
-      { input: "0 0 0", expected: "0 0 0" },
-    ],
-    hint:
-      "overload unary `-` as a member: `Vector3D operator-() const { return " +
-      "Vector3D(-x, -y, -z); }`. in main read the three ints, create the " +
-      "vector, and print the negated coordinates space-separated.",
-  },
-  {
-    id: "multilevel-inheritance-payroll",
-    title: "Multilevel Inheritance for Payroll",
-    difficulty: "medium",
-    body:
-      "Create a base class `Person` with a protected string `name`. Derive a " +
-      "class `Employee` from `Person` with a protected integer `baseSalary`. " +
-      "Derive `Manager` from `Employee` with a private integer `bonus`. Create " +
-      "a constructor in `Manager` that initializes all three fields. Provide a " +
-      "`displayTotal()` method in `Manager` that prints `Name: <name>, Total: " +
-      "<baseSalary + bonus>`. Read a string and two integers from standard " +
-      "input, instantiate a `Manager`, and call `displayTotal()`.",
-    input: "A string `name`, followed by two integers `baseSalary` and `bonus`.",
-    output: "A formatted string: `Name: <name>, Total: <total>`.",
-    examples: [
-      { input: "Alice 50000 10000", output: "Name: Alice, Total: 60000" },
-    ],
-    starterCode: SHELL_STRING,
-    tests: [
-      { input: "Alice 50000 10000", expected: "Name: Alice, Total: 60000" },
-      { input: "Bob 0 500", expected: "Name: Bob, Total: 500" },
-      { input: "Charlie 100000 0", expected: "Name: Charlie, Total: 100000" },
-    ],
-    hint:
-      "class `Person` has protected string name. `class Employee : public " +
-      "Person` adds protected int baseSalary. `class Manager : public Employee` " +
-      "adds private int bonus, with a constructor that initializes all three " +
-      "fields, plus displayTotal() printing `Name: <name>, Total: <baseSalary + " +
-      "bonus>`. in main read name, salary, bonus, create a Manager and call " +
-      "displayTotal().",
-  },
-  {
-    id: "this-pointer-shadowing",
-    title: "Resolve Shadowing with the This Pointer",
-    difficulty: "medium",
-    body:
-      "Create a class `Box` with private integer members `length`, `width`, " +
-      "and `height`. Write a parameterized constructor whose parameter names " +
-      "are exactly `length`, `width`, and `height`. Use the `this` pointer " +
-      "inside the constructor to correctly assign the parameters to the data " +
-      "members (resolving the naming conflict, as taught in Lecture 9). Write a " +
-      "public method `volume()` that returns their product. Read 3 integers " +
-      "from input, create the `Box`, and print the volume.",
-    input: "Three space-separated integers.",
-    output: "A single integer representing the volume.",
-    examples: [{ input: "2 3 4", output: "24" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "2 3 4", expected: "24" },
-      { input: "10 10 10", expected: "1000" },
-      { input: "5 0 2", expected: "0" },
-      { input: "1 1 1", expected: "1" },
-    ],
-    hint:
-      "class `Box` has private int length, width, height. in the constructor " +
-      "use `this->length = length;` (etc.) to set the members from the " +
-      "same-named parameters. add `int volume()` returning the product. in main " +
-      "read the three ints, create the Box, and print b.volume().",
-  },
-  {
-    id: "exception-rethrowing",
-    title: "Catching and Rethrowing Exceptions",
-    difficulty: "hard",
-    body:
-      "Write a function `processNumber(int n)` that checks if `n < 0`. If " +
-      "true, it throws a standard integer exception with the value `n`. Write a " +
-      "`wrapperFunction(int n)` that calls `processNumber(n)` inside a " +
-      "try-catch block. If `wrapperFunction` catches the integer exception, it " +
-      "must print `Caught in wrapper, rethrowing...` and then immediately " +
-      "`throw;` to pass it up. In `main`, call `wrapperFunction` within a " +
-      "try-catch block. Catch the rethrown exception and print `Caught in " +
-      "main!`. If no exception is thrown (i.e. `n >= 0`), print `Valid " +
-      "number`. Read `n` from standard input.",
-    input: "A single integer `n`.",
-    output: "Exception trace or success message depending on `n`.",
-    examples: [
-      { input: "-5", output: "Caught in wrapper, rethrowing...\nCaught in main!" },
-      { input: "10", output: "Valid number" },
-    ],
-    starterCode: SHELL,
-    tests: [
-      { input: "-5", expected: "Caught in wrapper, rethrowing...\nCaught in main!" },
-      { input: "10", expected: "Valid number" },
-      { input: "0", expected: "Valid number" },
-      { input: "-999", expected: "Caught in wrapper, rethrowing...\nCaught in main!" },
-    ],
-    hint:
-      "in processNumber, `if (n < 0) throw n;`. in wrapperFunction, wrap the " +
-      "call in try/catch(int): print `Caught in wrapper, rethrowing...` with a " +
-      "newline (endl) then `throw;`. in main, wrap wrapperFunction in " +
-      "try/catch(int) printing `Caught in main!`, and print `Valid number` if " +
-      "no exception occurred.",
-  },
-  {
-    id: "virtual-functions-animal-sound",
-    title: "Runtime Polymorphism with Virtual Functions",
-    difficulty: "easy",
-    body:
-      "Create a base class `Animal` with a virtual function `speak()` that " +
-      "prints `\"Some generic sound\"`. Create derived classes `Dog` (prints " +
-      "`\"Woof\"`) and `Cat` (prints `\"Meow\"`), each overriding `speak()`. " +
-      "Read an integer `choice` from standard input: if `choice` is `1`, call " +
-      "`speak()` through a base-class pointer pointing to a `Dog`; otherwise, " +
-      "point it at a `Cat`.",
-    input: "A single integer `choice` (1 or 2).",
-    output: "The sound printed by the overridden `speak()` of the selected animal.",
-    examples: [
-      { input: "1", output: "Woof" },
-      { input: "2", output: "Meow" },
-    ],
-    starterCode: SHELL,
-    tests: [
-      { input: "1", expected: "Woof" },
-      { input: "2", expected: "Meow" },
-    ],
-    hint:
-      "declare `virtual void speak()` in `Animal`, override it in `Dog` and " +
-      "`Cat` with `void speak() override`. in main, declare `Animal* a`, " +
-      "point it at a `Dog` or `Cat` object based on `choice`, then call " +
-      "`a->speak()` — the virtual dispatch picks the right override at runtime.",
-  },
-  {
-    id: "friend-function-box-volume",
-    title: "Friend Function for Box Volume",
-    difficulty: "easy",
-    body:
-      "Create a class `Box` with a private integer attribute `length`. Declare " +
-      "a non-member function `int getVolume(Box b1, Box b2)` as a `friend` of " +
-      "`Box`, which returns the product of the two boxes' `length` values. " +
-      "Read two integers from standard input, construct two `Box` objects, and " +
-      "print the result of `getVolume`.",
-    input: "Two space-separated integers: the lengths of the two boxes.",
-    output: "A single integer: the product of the two lengths.",
-    examples: [{ input: "3 4", output: "12" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "3 4", expected: "12" },
-      { input: "5 6", expected: "30" },
-      { input: "1 1", expected: "1" },
-      { input: "10 10", expected: "100" },
-    ],
-    hint:
-      "give `Box` a private int `length` and a constructor that sets it. " +
-      "inside the class, declare `friend int getVolume(Box b1, Box b2);`. " +
-      "define `getVolume` outside the class (no `Box::` prefix needed since " +
-      "it's a friend, not a member) — it can access `b1.length` and " +
-      "`b2.length` directly despite them being private.",
-  },
-  {
-    id: "stream-operator-overloading-point",
-    title: "Overloading << and >> for a Point Class",
-    difficulty: "medium",
-    body:
-      "Create a class `Point` with public integers `x` and `y`. Overload the " +
-      "stream extraction operator `>>` to read a `Point` from `cin`, and the " +
-      "stream insertion operator `<<` to print it as `(x, y)`. Both should be " +
-      "implemented as `friend` functions returning references to the stream " +
-      "so they can be chained. Read one point and print it back.",
-    input: "Two space-separated integers: `x` and `y`.",
-    output: "The point formatted as `(x, y)`.",
-    examples: [{ input: "3 4", output: "(3, 4)" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "3 4", expected: "(3, 4)" },
-      { input: "-1 5", expected: "(-1, 5)" },
-      { input: "0 0", expected: "(0, 0)" },
-    ],
-    hint:
-      "declare `friend ostream& operator<<(ostream& os, const Point& p);` and " +
-      "`friend istream& operator>>(istream& is, Point& p);` inside `Point`. " +
-      "define both outside the class: `operator<<` writes `\"(\" << p.x << " +
-      "\", \" << p.y << \")\"` and returns `os`; `operator>>` reads into " +
-      "`p.x` and `p.y` and returns `is`.",
-  },
-  {
-    id: "file-write-read-roundtrip",
-    title: "Writing and Reading a File",
-    difficulty: "medium",
-    body:
-      "Read a name and an integer score from standard input. Write both to a " +
-      "file called `data.txt` using `ofstream`, close it, then open the same " +
-      "file with `ifstream`, read the name and score back, and print them.",
-    input: "A name (no spaces) and an integer score, space-separated.",
-    output: "The name and score read back from the file, space-separated.",
-    examples: [{ input: "Ram 85", output: "Ram 85" }],
-    starterCode: SHELL_STRING,
-    tests: [
-      { input: "Ram 85", expected: "Ram 85" },
-      { input: "Sita 92", expected: "Sita 92" },
-    ],
-    hint:
-      "include `<fstream>`. open `ofstream out(\"data.txt\")`, write " +
-      "`name << \" \" << score`, then `out.close()`. open " +
-      "`ifstream in(\"data.txt\")`, read back into a string and an int with " +
-      "`in >> readName >> readScore`, then print them space-separated.",
-  },
-  {
-    id: "dynamic-array-sum",
-    title: "Dynamic Memory with new and delete",
-    difficulty: "medium",
-    body:
-      "Create a class `IntArray` that allocates an integer array of size `n` " +
-      "on the heap using `new` inside its constructor, reads `n` integers " +
-      "into it, and provides a `sum()` method. Free the memory with `delete[]` " +
-      "in the destructor. Read `n` followed by `n` integers, and print their sum.",
-    input: "An integer `n`, then `n` space-separated integers.",
-    output: "A single integer: the sum of the values.",
-    examples: [{ input: "3\n1 2 3", output: "6" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "3\n1 2 3", expected: "6" },
-      { input: "5\n10 20 30 40 50", expected: "150" },
-      { input: "1\n7", expected: "7" },
-    ],
-    hint:
-      "in the constructor, do `data = new int[n]` and read each element with " +
-      "a loop of `cin >> data[i]`. `sum()` loops over `size` adding up " +
-      "`data[i]`. in `~IntArray()`, call `delete[] data` to avoid a memory leak.",
-  },
-  {
-    id: "multiple-inheritance-teamlead",
-    title: "Multiple Inheritance for Total Pay",
-    difficulty: "medium",
-    body:
-      "Create two unrelated base classes: `Employee` with an integer " +
-      "`baseSalary`, and `Manager` with an integer `bonus`. Create a class " +
-      "`TeamLead` that inherits from both and provides a `totalPay()` method " +
-      "returning `baseSalary + bonus`. Read both values from standard input " +
-      "and print the total.",
-    input: "Two space-separated integers: `baseSalary` and `bonus`.",
-    output: "A single integer: their sum.",
-    examples: [{ input: "50000 5000", output: "55000" }],
-    starterCode: SHELL,
-    tests: [
-      { input: "50000 5000", expected: "55000" },
-      { input: "30000 2000", expected: "32000" },
-      { input: "0 0", expected: "0" },
-    ],
-    hint:
-      "`class TeamLead : public Employee, public Manager` inherits both " +
-      "bases at once. give `TeamLead` a constructor that forwards its two " +
-      "arguments to `Employee(b)` and `Manager(bo)` in the initializer list, " +
-      "then `totalPay()` just returns `baseSalary + bonus`.",
-  },
-  {
-    id: "comparison-operator-fraction",
-    title: "Overloading < to Compare Fractions",
-    difficulty: "medium",
-    body:
-      "Create a class `Fraction` with integers `num` and `den`. Overload the " +
-      "`<` operator as a member function to compare two fractions by cross-" +
-      "multiplication (avoid floating point). Read two fractions from " +
-      "standard input; print `\"First is smaller\"` if the first is less than " +
-      "the second, otherwise print `\"Second is smaller or equal\"`.",
-    input: "Four space-separated integers: `n1 d1 n2 d2`.",
-    output: "Either `First is smaller` or `Second is smaller or equal`.",
-    examples: [
-      { input: "1 2 3 4", output: "First is smaller" },
-      { input: "3 4 1 2", output: "Second is smaller or equal" },
-    ],
-    starterCode: SHELL,
-    tests: [
-      { input: "1 2 3 4", expected: "First is smaller" },
-      { input: "3 4 1 2", expected: "Second is smaller or equal" },
-      { input: "1 2 1 2", expected: "Second is smaller or equal" },
-    ],
-    hint:
-      "overload `bool operator<(const Fraction& other) const` and compare " +
-      "`num * other.den < other.num * den` instead of dividing, so it stays " +
-      "exact with integers. in main, read the four ints, build two " +
-      "`Fraction`s, and branch on `a < b`.",
-  },
-  {
-    id: "custom-exception-negative-age",
-    title: "Custom Exception Class",
-    difficulty: "hard",
-    body:
-      "Create a class `NegativeAgeException` that publicly inherits from " +
-      "`std::exception` and overrides `what()` to return a custom message. " +
-      "Write a function `checkAge(int age)` that throws this exception if " +
-      "`age` is negative, otherwise prints `\"Valid age: <age>\"`. Read an " +
-      "integer, call `checkAge`, and catch the exception to print " +
-      "`\"Error: <message>\"` if thrown.",
-    input: "A single integer `age` (can be negative).",
+      "Implement a class with a `static` data member (a count) and a `static` " +
+      "member function. Each object holds a serial number: the first object " +
+      "created is numbered `1`, the second `2`, and so on, and the constructor " +
+      "examines the static count to decide the serial number of the new object. " +
+      "The program reads `n`, creates `n` objects, has each one report its own " +
+      "serial number, and then uses the static function to print the total " +
+      "number of objects created.",
+    input: "One integer `n` (`0 <= n <= 1000`).",
     output:
-      "Either `Valid age: <age>` or `Error: Age cannot be negative`.",
+      "Print exactly `n` lines `Object number: <k>` for `k = 1..n` in order, " +
+      "followed by one final line `Total objects: <n>`. When `n = 0`, print " +
+      "only `Total objects: 0`.",
     examples: [
-      { input: "25", output: "Valid age: 25" },
-      { input: "-5", output: "Error: Age cannot be negative" },
+      {
+        input: "3",
+        output:
+          "Object number: 1\nObject number: 2\nObject number: 3\nTotal objects: 3",
+      },
+      { input: "0", output: "Total objects: 0" },
     ],
-    starterCode:
-      "#include <iostream>\n#include <exception>\n#include <string>\nusing namespace std;\n\nint main() {\n\n    return 0;\n}\n",
+    starterCode: SHELL,
     tests: [
-      { input: "25", expected: "Valid age: 25" },
-      { input: "-5", expected: "Error: Age cannot be negative" },
-      { input: "0", expected: "Valid age: 0" },
+      {
+        input: "3",
+        expected:
+          "Object number: 1\nObject number: 2\nObject number: 3\nTotal objects: 3",
+      },
+      { input: "0", expected: "Total objects: 0" },
+      { input: "1", expected: "Object number: 1\nTotal objects: 1" },
+      { input: "2", expected: "Object number: 1\nObject number: 2\nTotal objects: 2" },
+      {
+        input: "5",
+        expected:
+          "Object number: 1\nObject number: 2\nObject number: 3\nObject number: 4\nObject number: 5\nTotal objects: 5",
+      },
     ],
     hint:
-      "`class NegativeAgeException : public exception` stores a `string " +
-      "message` and overrides `const char* what() const noexcept` to return " +
-      "`message.c_str()`. `checkAge` does `if (age < 0) throw " +
-      "NegativeAgeException(\"Age cannot be negative\");`. wrap the call in " +
-      "`try { ... } catch (NegativeAgeException& e) { cout << \"Error: \" << " +
-      "e.what(); }`.",
+      "Increment the static counter in the constructor and copy it into the " +
+      "object's own serial number, define the static member outside the class, " +
+      "and call the static function with `ClassName::function()`.",
   },
   {
-    id: "template-class-two-types-pair",
-    title: "Template Class with Two Type Parameters",
+    id: "library-fines-polymorphism",
+    title: "Library Book Fines with Runtime Polymorphism",
     difficulty: "hard",
+    source: "Apr/May 2023",
+    sources: ["Apr/May 2023"],
+    years: [2023],
+    repeated: false,
     body:
-      "Create a template class `Pair<T1, T2>` holding two private members " +
-      "`first` (type `T1`) and `second` (type `T2`), with a constructor and a " +
-      "`display()` method that prints them space-separated. Instantiate it as " +
-      "`Pair<string, int>`, reading a name and an age from standard input.",
-    input: "A name (no spaces) and an integer age, space-separated.",
-    output: "The name and age printed space-separated.",
-    examples: [{ input: "Hari 21", output: "Hari 21" }],
+      "Implement the book issuing component of a library. Class `Book` has " +
+      "`name` and `author` (strings). Derive `ReferenceBook` (stores `genre`) " +
+      "and `IssuableBook` (stores `genre`) with `lateReturn` (days late) and " +
+      "`fine` (fine amount). A reference book can be issued for `1` day and " +
+      "earns a fine of Rs. `5`/day after `1` day. An issuable book can be " +
+      "issued for `30` days and earns a fine of Rs. `1`/day after `30` days. " +
+      "Each issue gets a unique `issueID` starting from `1` and " +
+      "auto-incremented by `1` per issue. Use runtime polymorphism (a virtual " +
+      "method called through a `Book*`) to display information for the books " +
+      "issued.",
+    input:
+      "First line `k` (number of issues, `1 <= k <= 20`). Then `k` lines each " +
+      "`type name author genre lateDays`, where `type` is `R` (reference) or " +
+      "`I` (issuable), the four text fields are single words, and `lateDays` " +
+      "is an integer `0 <= lateDays <= 1000`.",
+    output:
+      "Print exactly one line per issue, in order: `IssueID=<id> " +
+      "Name=<name> Author=<author> Genre=<genre> Late=<lateDays> " +
+      "Fine=<fine>`.",
+    examples: [
+      {
+        input: "2\nI Dune Herbert SciFi 5\nR Atlas Smith Geography 2",
+        output:
+          "IssueID=1 Name=Dune Author=Herbert Genre=SciFi Late=5 Fine=0\nIssueID=2 Name=Atlas Author=Smith Genre=Geography Late=2 Fine=5",
+      },
+    ],
     starterCode: SHELL_STRING,
     tests: [
-      { input: "Hari 21", expected: "Hari 21" },
-      { input: "Gita 19", expected: "Gita 19" },
+      {
+        input: "1\nR Atlas Smith Geo 0",
+        expected: "IssueID=1 Name=Atlas Author=Smith Genre=Geo Late=0 Fine=0",
+      },
+      {
+        input: "1\nR Atlas Smith Geo 1",
+        expected: "IssueID=1 Name=Atlas Author=Smith Genre=Geo Late=1 Fine=0",
+      },
+      {
+        input: "1\nR Atlas Smith Geo 10",
+        expected: "IssueID=1 Name=Atlas Author=Smith Genre=Geo Late=10 Fine=45",
+      },
+      {
+        input: "1\nI Dune Herbert SciFi 31",
+        expected: "IssueID=1 Name=Dune Author=Herbert Genre=SciFi Late=31 Fine=1",
+      },
+      {
+        input: "1\nI Dune Herbert SciFi 45",
+        expected: "IssueID=1 Name=Dune Author=Herbert Genre=SciFi Late=45 Fine=15",
+      },
     ],
     hint:
-      "`template <typename T1, typename T2> class Pair { T1 first; T2 " +
-      "second; public: Pair(T1 a, T2 b) : first(a), second(b) {} void " +
-      "display() { cout << first << \" \" << second << endl; } };`. in main, " +
-      "instantiate `Pair<string, int> p(name, age);` and call `p.display()`.",
+      "Compute the fine as `max(0, late - allowedDays) * rate` inside each " +
+      "derived class's overriding method, and use a `static int` for the ID " +
+      "counter.",
+  },
+  {
+    id: "greatest-three-template",
+    title: "Function Template with Multiple Types",
+    difficulty: "medium",
+    source: "Apr/May 2023, Sep 2024",
+    sources: ["Apr/May 2023", "Sep 2024"],
+    years: [2023, 2024],
+    repeated: true,
+    body:
+      "Write a function template that works with multiple template types. In " +
+      "Apr/May 2023 the template took two different types, and in Sep 2024 a " +
+      "template returned the greatest of three numbers with the arguments " +
+      "passed as reference variables. Implement `template <class T> T " +
+      "greatest(T &a, T &b, T &c)` and use it on integers. The program reads " +
+      "three integers and prints the greatest.",
+    input: "Three integers `a b c` on one line (`-100000 <= a, b, c <= 100000`).",
+    output: "Print exactly the greatest of the three values.",
+    examples: [
+      { input: "1 2 3", output: "3" },
+      { input: "-5 -2 -9", output: "-2" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "1 2 3", expected: "3" },
+      { input: "3 2 1", expected: "3" },
+      { input: "-5 -2 -9", expected: "-2" },
+      { input: "0 0 0", expected: "0" },
+      { input: "7 7 5", expected: "7" },
+    ],
+    hint:
+      "Take the parameters by reference and compare them with `if`/`else` or " +
+      "nested `? :` inside the template.",
+  },
+  {
+    id: "date-age-calculation",
+    title: "Date Class Age Calculation",
+    difficulty: "hard",
+    source: "Apr/May 2023",
+    sources: ["Apr/May 2023"],
+    years: [2023],
+    repeated: false,
+    body:
+      "Implement a class that represents a day in `YYYY`, `MM`, `DD` format. " +
+      "Overload an operator (for example `operator-`) so that subtracting a " +
+      "birth date from a given date returns the age of the person, in " +
+      "completed years, at the entered date. Age is the number of full years, " +
+      "so a birthday not yet reached in the entered year does not count.",
+    input:
+      "Six integers on one line: `by bm bd cy cm cd`, where `(by, bm, bd)` " +
+      "is the birth date and `(cy, cm, cd)` is the entered date (`cy >= by`, " +
+      "valid dates).",
+    output: "Print exactly the age in completed years as a single integer.",
+    examples: [
+      { input: "2000 5 15 2024 5 15", output: "24" },
+      { input: "2000 5 15 2024 5 14", output: "23" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "2000 5 15 2024 5 15", expected: "24" },
+      { input: "2000 5 15 2024 5 14", expected: "23" },
+      { input: "2000 5 15 2024 6 1", expected: "24" },
+      { input: "2024 1 1 2024 1 1", expected: "0" },
+      { input: "1990 12 31 2025 1 1", expected: "34" },
+    ],
+    hint:
+      "Start with `cy - by`, then subtract one if `(cm, cd)` is earlier than " +
+      "`(bm, bd)`.",
+  },
+  {
+    id: "age-after-period",
+    title: "Age After a Period",
+    difficulty: "hard",
+    source: "Sep 2024",
+    sources: ["Sep 2024"],
+    years: [2024],
+    repeated: false,
+    body:
+      "Write a program to represent an age of a person in years, months and " +
+      "days. Overload `operator+` to calculate the age of the person after a " +
+      "certain period, where the period is also represented in years, months " +
+      "and days. Normalize the result using `1 month = 30 days` and `1 year " +
+      "= 12 months`.",
+    input:
+      "Six integers `y1 m1 d1 y2 m2 d2` on one line, the age followed by the " +
+      "period (all `>= 0`, `m < 12`, `d < 30` for each).",
+    output:
+      "Print exactly `<years> <months> <days>` of the sum, with months in " +
+      "`0..11` and days in `0..29`.",
+    examples: [
+      { input: "20 5 15 1 2 20", output: "21 8 5" },
+      { input: "10 11 29 0 1 1", output: "11 1 0" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "20 5 15 1 2 20", expected: "21 8 5" },
+      { input: "0 0 0 0 0 0", expected: "0 0 0" },
+      { input: "10 11 29 0 1 1", expected: "11 1 0" },
+      { input: "5 6 10 5 6 10", expected: "11 0 20" },
+      { input: "1 0 0 0 0 0", expected: "1 0 0" },
+    ],
+    hint:
+      "Add each field, carry `days / 30` into months, then carry `months / " +
+      "12` into years, keeping the remainders.",
+  },
+  {
+    id: "array-max-exception",
+    title: "Maximum of Array with Exception Handling",
+    difficulty: "medium",
+    source: "Sep 2024",
+    sources: ["Sep 2024"],
+    years: [2024],
+    repeated: false,
+    body:
+      "Write a program that returns the greatest value of an array and uses " +
+      "exception handling to check two conditions: the array size is out of " +
+      "bound (`n` is outside `1..100`) or the array contains a negative " +
+      "value. The array must contain only positive numbers.",
+    input:
+      "First line `n`. Second line (only present when `1 <= n <= 100`) `n` " +
+      "integers.",
+    output:
+      "Print exactly `Array size out of bound` if `n < 1` or `n > 100`. " +
+      "Otherwise print exactly `Negative value found` if any element is " +
+      "negative. Otherwise print exactly the greatest value.",
+    examples: [
+      { input: "3\n4 9 2", output: "9" },
+      { input: "3\n4 -1 2", output: "Negative value found" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "3\n4 9 2", expected: "9" },
+      { input: "1\n5", expected: "5" },
+      { input: "3\n4 -1 2", expected: "Negative value found" },
+      { input: "0", expected: "Array size out of bound" },
+      { input: "101", expected: "Array size out of bound" },
+    ],
+    hint:
+      "Check the size and read the values inside a `try` block, `throw` a " +
+      "distinct message for each failure, and print it from the `catch`.",
+  },
+  {
+    id: "digital-wallet-abstract",
+    title: "Digital Wallet with Abstract Class",
+    difficulty: "hard",
+    source: "Sep 2024",
+    sources: ["Sep 2024"],
+    years: [2024],
+    repeated: false,
+    body:
+      "Represent transactions of a digital wallet. Define an abstract class " +
+      "`Digital_wallet` with data members `Balance` and `RewardPoints`. " +
+      "Derive class `Transaction` that performs load balance, make a payment " +
+      "and show payment history. For every payment strictly greater than " +
+      "`2000`, earn `50` reward points. Every `1000` reward points earn a " +
+      "balance of `10`, added to the balance and removing those `1000` " +
+      "points. A payment is only accepted if `amount <= Balance`, otherwise " +
+      "it is rejected. Store the transactions in an array and use runtime " +
+      "polymorphism to display a particular transaction by its ID (IDs start " +
+      "at `1` in the order performed).",
+    input:
+      "First line `q` (`1 <= q <= 20`). Then `q` lines, each `L amount` (load " +
+      "balance) or `P amount` (make a payment), with `1 <= amount <= 100000`. " +
+      "The last line contains one integer `id`, the transaction to display.",
+    output:
+      "Print exactly `ID=<id> Type=<Load|Payment> Amount=<amount> " +
+      "Status=<OK|Rejected> Balance=<balance after> Reward=<reward after>` " +
+      "for the requested transaction.",
+    examples: [
+      {
+        input: "2\nL 5000\nP 3000\n2",
+        output: "ID=2 Type=Payment Amount=3000 Status=OK Balance=2000 Reward=50",
+      },
+    ],
+    starterCode: SHELL,
+    tests: [
+      {
+        input: "1\nL 5000\n1",
+        expected: "ID=1 Type=Load Amount=5000 Status=OK Balance=5000 Reward=0",
+      },
+      {
+        input: "2\nL 5000\nP 3000\n2",
+        expected: "ID=2 Type=Payment Amount=3000 Status=OK Balance=2000 Reward=50",
+      },
+      {
+        input: "2\nL 3000\nP 2000\n2",
+        expected: "ID=2 Type=Payment Amount=2000 Status=OK Balance=1000 Reward=0",
+      },
+      {
+        input: "2\nL 100\nP 500\n2",
+        expected: "ID=2 Type=Payment Amount=500 Status=Rejected Balance=100 Reward=0",
+      },
+    ],
+    hint:
+      "Make `Digital_wallet` abstract with a pure virtual `display`, keep a " +
+      "`Transaction*` (or base pointer) array, and record a snapshot of " +
+      "balance and reward after each operation.",
+  },
+  {
+    id: "employee-virtual-base",
+    title: "Employee Virtual Base Class",
+    difficulty: "hard",
+    source: "Jun/Jul 2024",
+    sources: ["Jun/Jul 2024"],
+    years: [2024],
+    repeated: false,
+    body:
+      "Define a virtual base class. Create a base class `Employee` with a " +
+      "`name` and `id`. Derive two classes, `Administrative` and `Academic`, " +
+      "virtually from `Employee`. Derive another class `HOD` from both. " +
+      "Create appropriate data members and member functions in each class to " +
+      "show the implementation of a virtual base class, and construct the " +
+      "`HOD` so that the `Employee` part is initialized only once.",
+    input:
+      "One line `name id salary`, with `name` a single word, `id` and " +
+      "`salary` integers.",
+    output:
+      "Print exactly one line: `Name: <name> ID: <id> Salary: <salary>`.",
+    examples: [{ input: "Ram 101 50000", output: "Name: Ram ID: 101 Salary: 50000" }],
+    starterCode: SHELL_STRING,
+    tests: [
+      { input: "Ram 101 50000", expected: "Name: Ram ID: 101 Salary: 50000" },
+      { input: "A 1 0", expected: "Name: A ID: 1 Salary: 0" },
+      { input: "Sita 7 120000", expected: "Name: Sita ID: 7 Salary: 120000" },
+      { input: "Hari 999 1", expected: "Name: Hari ID: 999 Salary: 1" },
+    ],
+    hint:
+      "Write `class Administrative : virtual public Employee` (same for " +
+      "`Academic`), so `HOD` holds a single `Employee` subobject and can " +
+      "print `name` and `id` without ambiguity.",
+  },
+  {
+    id: "player-class",
+    title: "Player Class",
+    difficulty: "easy",
+    source: "Jan 2025",
+    sources: ["Jan 2025"],
+    years: [2025],
+    repeated: false,
+    body:
+      "Design a class `Player` with data members `player_Name`, `jersy_no`, " +
+      "`country` and `email_address`. Define a constructor and appropriate " +
+      "methods to get the player information and display it. The program " +
+      "reads one player and displays the information.",
+    input:
+      "One line with four values: `player_Name jersy_no country " +
+      "email_address` (single-word strings, and `jersy_no` an integer).",
+    output:
+      "Print exactly four lines: `Name: <player_Name>`, `Jersey No: " +
+      "<jersy_no>`, `Country: <country>`, `Email: <email_address>`.",
+    examples: [
+      {
+        input: "Messi 10 Argentina messi@mail.com",
+        output: "Name: Messi\nJersey No: 10\nCountry: Argentina\nEmail: messi@mail.com",
+      },
+    ],
+    starterCode: SHELL_STRING,
+    tests: [
+      {
+        input: "Messi 10 Argentina messi@mail.com",
+        expected: "Name: Messi\nJersey No: 10\nCountry: Argentina\nEmail: messi@mail.com",
+      },
+      {
+        input: "A 0 X a@b.c",
+        expected: "Name: A\nJersey No: 0\nCountry: X\nEmail: a@b.c",
+      },
+      {
+        input: "Paras 7 Nepal paras@nep.com",
+        expected: "Name: Paras\nJersey No: 7\nCountry: Nepal\nEmail: paras@nep.com",
+      },
+      {
+        input: "Zed 99 India zed@ind.in",
+        expected: "Name: Zed\nJersey No: 99\nCountry: India\nEmail: zed@ind.in",
+      },
+    ],
+    hint:
+      "Take the four fields in the constructor, keep them private, and print " +
+      "them from a `display()` method.",
+  },
+  {
+    id: "rectangle-calculate-inheritance",
+    title: "Rectangle and Calculate Inheritance",
+    difficulty: "medium",
+    source: "Jan 2025",
+    sources: ["Jan 2025"],
+    years: [2025],
+    repeated: false,
+    body:
+      "Create a parent class `Rectangle` with `length` and `breadth` of type " +
+      "`float` and the member functions `void setlength(float)` and `void " +
+      "setbreadth(float)`. Create a child class `Calculate` with `float " +
+      "perimeter()`, `float area()` and `void show()` (displays the length " +
+      "and breadth). In `main`, create two objects and set their sizes from " +
+      "input, then display each rectangle with its area and perimeter.",
+    input:
+      "Four real numbers on one line: `l1 b1 l2 b2` (`0 <= value <= 1000`).",
+    output:
+      "Print exactly two lines, one per rectangle: " +
+      "`Length=<l> Breadth=<b> Area=<a> Perimeter=<p>` with every number " +
+      "rounded to 2 decimal places.",
+    examples: [
+      {
+        input: "10 7.5 12.5 10",
+        output:
+          "Length=10.00 Breadth=7.50 Area=75.00 Perimeter=35.00\nLength=12.50 Breadth=10.00 Area=125.00 Perimeter=45.00",
+      },
+    ],
+    starterCode: SHELL,
+    tests: [
+      {
+        input: "10 7.5 12.5 10",
+        expected:
+          "Length=10.00 Breadth=7.50 Area=75.00 Perimeter=35.00\nLength=12.50 Breadth=10.00 Area=125.00 Perimeter=45.00",
+      },
+      {
+        input: "0 5 1 1",
+        expected:
+          "Length=0.00 Breadth=5.00 Area=0.00 Perimeter=10.00\nLength=1.00 Breadth=1.00 Area=1.00 Perimeter=4.00",
+      },
+      {
+        input: "2 3 4 5",
+        expected:
+          "Length=2.00 Breadth=3.00 Area=6.00 Perimeter=10.00\nLength=4.00 Breadth=5.00 Area=20.00 Perimeter=18.00",
+      },
+      {
+        input: "100 100 0.5 0.5",
+        expected:
+          "Length=100.00 Breadth=100.00 Area=10000.00 Perimeter=400.00\nLength=0.50 Breadth=0.50 Area=0.25 Perimeter=2.00",
+      },
+    ],
+    hint:
+      "`Calculate` publicly inherits `Rectangle`, so it can read the " +
+      "protected `length` and `breadth` set by the parent's setters.",
+  },
+  {
+    id: "bank-account-inheritance",
+    title: "Bank Account Inheritance",
+    difficulty: "hard",
+    source: "Jan 2025",
+    sources: ["Jan 2025"],
+    years: [2025],
+    repeated: false,
+    body:
+      "A bank maintains two kinds of accounts: a Saving account, which " +
+      "provides interest but no withdrawal facility, and a Current account, " +
+      "which provides withdrawal facility but no interest. Create a class " +
+      "`Account` that stores the customer name, account number and type of " +
+      "account. Derive `Current_Account` and `Saving_Account` and give them " +
+      "the necessary constructors and destructors. Support these tasks: " +
+      "create an instance and display the customer details, accept deposits " +
+      "and update the balance, display the balance, and compute and deposit " +
+      "interest (Saving only). Interest is `balance * rate / 100`, added to " +
+      "the balance.",
+    input:
+      "First line `S` or `C` (account type), then `name accountNo`. Then a " +
+      "line with `d` (deposits count) followed by `d` deposit amounts, then " +
+      "a line with the interest `rate` (percent).",
+    output:
+      "Print exactly: line 1 `Name: <name> Account: <accountNo> Type: " +
+      "<Saving|Current>`, line 2 `Balance: <balance>` after the deposits, " +
+      "and for a Saving account a line 3 `Balance after interest: <balance>`. " +
+      "Balances are printed rounded to 2 decimal places. A Current account " +
+      "prints only lines 1 and 2.",
+    examples: [
+      {
+        input: "S Ram 1001\n2 1000 500\n10",
+        output:
+          "Name: Ram Account: 1001 Type: Saving\nBalance: 1500.00\nBalance after interest: 1650.00",
+      },
+    ],
+    starterCode: SHELL_STRING,
+    tests: [
+      {
+        input: "S Ram 1001\n2 1000 500\n10",
+        expected:
+          "Name: Ram Account: 1001 Type: Saving\nBalance: 1500.00\nBalance after interest: 1650.00",
+      },
+      {
+        input: "C Sita 2002\n1 800\n5",
+        expected: "Name: Sita Account: 2002 Type: Current\nBalance: 800.00",
+      },
+      {
+        input: "S A 1\n0\n10",
+        expected:
+          "Name: A Account: 1 Type: Saving\nBalance: 0.00\nBalance after interest: 0.00",
+      },
+      {
+        input: "S B 2\n1 100\n0",
+        expected:
+          "Name: B Account: 2 Type: Saving\nBalance: 100.00\nBalance after interest: 100.00",
+      },
+      {
+        input: "C D 4\n2 50 25\n5",
+        expected: "Name: D Account: 4 Type: Current\nBalance: 75.00",
+      },
+    ],
+    hint:
+      "Keep `balance` in the base class with a `deposit()`, and put " +
+      "`computeInterest()` only in `Saving_Account`; the interest rate line " +
+      "is read but ignored for a Current account.",
+  },
+  {
+    id: "calculator-class-template",
+    title: "Calculator Class Template",
+    difficulty: "hard",
+    source: "Jan 2025",
+    sources: ["Jan 2025"],
+    years: [2025],
+    repeated: false,
+    body:
+      "Write a class template `Calculator<T>` that shows the working of a " +
+      "calculator, with member functions `add`, `sub`, `mul` and `div` taking " +
+      "two values of type `T`. The program reads an operator and two integers " +
+      "and prints the result using `Calculator<int>`, with `div` performing " +
+      "integer division. A division by zero must print an error.",
+    input:
+      "One line `op a b`, where `op` is one of `+`, `-`, `*`, `/` and `a`, " +
+      "`b` are integers (`-10000 <= a, b <= 10000`).",
+    output:
+      "Print exactly the integer result, or exactly `Division by zero` when " +
+      "`op` is `/` and `b` is `0`.",
+    examples: [
+      { input: "+ 3 4", output: "7" },
+      { input: "/ 7 2", output: "3" },
+    ],
+    starterCode: SHELL,
+    tests: [
+      { input: "+ 3 4", expected: "7" },
+      { input: "- 3 10", expected: "-7" },
+      { input: "* -3 4", expected: "-12" },
+      { input: "/ 7 2", expected: "3" },
+      { input: "/ 5 0", expected: "Division by zero" },
+    ],
+    hint:
+      "Declare `template <class T> class Calculator` with four small methods, " +
+      "and check for a zero divisor before calling `div`.",
+  },
+  {
+    id: "master-virtual-base",
+    title: "Master Class with Virtual Base Class",
+    difficulty: "hard",
+    source: "Aug 2018",
+    sources: ["Aug 2018"],
+    years: [2018],
+    repeated: false,
+    body:
+      "A class `master` derives information from the classes `account` and " +
+      "`admin`, which in turn are derived from the class `person`. Define all " +
+      "four classes and use the concept of a virtual base class so that " +
+      "`master` holds a single copy of `person`. `person` has data members " +
+      "`name` and `code`, `account` has `pay`, `admin` has `experience`, and " +
+      "`master` has the derived data members `name`, `code`, `experience` and " +
+      "`pay`. The program creates a `master` object, then updates it, and " +
+      "displays its information after each step.",
+    input:
+      "First line `name code experience pay` (`name` a single word, the other " +
+      "three integers). Second line `experience pay`, the new values used to " +
+      "update the object.",
+    output:
+      "Print exactly two lines. Line 1 (before the update): `Name: <name> " +
+      "Code: <code> Experience: <experience> Pay: <pay>`. Line 2 (after the " +
+      "update, only `experience` and `pay` change): the same format with the " +
+      "new values.",
+    examples: [
+      {
+        input: "Ram 101 5 50000\n6 60000",
+        output:
+          "Name: Ram Code: 101 Experience: 5 Pay: 50000\nName: Ram Code: 101 Experience: 6 Pay: 60000",
+      },
+    ],
+    starterCode: SHELL_STRING,
+    tests: [
+      {
+        input: "Ram 101 5 50000\n6 60000",
+        expected:
+          "Name: Ram Code: 101 Experience: 5 Pay: 50000\nName: Ram Code: 101 Experience: 6 Pay: 60000",
+      },
+      {
+        input: "A 1 0 0\n0 0",
+        expected:
+          "Name: A Code: 1 Experience: 0 Pay: 0\nName: A Code: 1 Experience: 0 Pay: 0",
+      },
+      {
+        input: "Sita 7 2 30000\n3 35000",
+        expected:
+          "Name: Sita Code: 7 Experience: 2 Pay: 30000\nName: Sita Code: 7 Experience: 3 Pay: 35000",
+      },
+      {
+        input: "Hari 999 10 1\n10 2",
+        expected:
+          "Name: Hari Code: 999 Experience: 10 Pay: 1\nName: Hari Code: 999 Experience: 10 Pay: 2",
+      },
+    ],
+    hint:
+      "Declare `account` and `admin` with `virtual public person`, give " +
+      "`master` update and display functions, and remember `name` and `code` " +
+      "stay the same during the update.",
+  },
+  {
+    id: "function-template-array-average",
+    title: "Function Template Array Average",
+    difficulty: "medium",
+    source: "Aug 2018",
+    sources: ["Aug 2018"],
+    years: [2018],
+    repeated: false,
+    body:
+      "Write a function template that returns the `float` average and takes " +
+      "two arguments: an array of numbers and the size of the array. In " +
+      "`main`, use the function with different types of data: first an `int` " +
+      "array, then a `float` array.",
+    input:
+      "First line `n` (`1 <= n <= 100`). Second line `n` integers. Third line " +
+      "`m` (`1 <= m <= 100`). Fourth line `m` real numbers.",
+    output:
+      "Print exactly two lines: the average of the integer array, then the " +
+      "average of the float array, each rounded to 2 decimal places.",
+    examples: [{ input: "3\n1 2 3\n2\n1.5 2.5", output: "2.00\n2.00" }],
+    starterCode: SHELL,
+    tests: [
+      { input: "3\n1 2 3\n2\n1.5 2.5", expected: "2.00\n2.00" },
+      { input: "1\n7\n1\n7", expected: "7.00\n7.00" },
+      { input: "4\n-1 -2 -3 -4\n3\n0 0 0", expected: "-2.50\n0.00" },
+      { input: "2\n1 2\n4\n0.5 0.5 0.5 0.5", expected: "1.50\n0.50" },
+      { input: "5\n10 20 30 40 50\n2\n-1 1", expected: "30.00\n0.00" },
+    ],
+    hint:
+      "Declare `template <class T> float average(T arr[], int size)`, sum as " +
+      "a `float`, and call it once with an `int` array and once with a " +
+      "`float` array.",
+  },
+  {
+    id: "publication-abstract-polymorphism",
+    title: "Publication Abstract Class with Runtime Polymorphism",
+    difficulty: "hard",
+    source: "Aug 2018",
+    sources: ["Aug 2018"],
+    years: [2018],
+    repeated: false,
+    body:
+      "Create a class `publication` that stores the `title` (a string) and " +
+      "`price` (type `float`) of a publication. Derive two classes: `book`, " +
+      "which adds a `page_count` (type `int`), and `tape`, which adds a " +
+      "playing `time_in_minutes` (type `float`). Each of the three classes has " +
+      "a `getdata()` function to get its data and a `putdata()` function to " +
+      "display it. Make `publication` an abstract class (with pure virtual " +
+      "`getdata` and `putdata`) and achieve runtime polymorphism by calling " +
+      "them through `publication*` pointers.",
+    input:
+      "First line `k` (`1 <= k <= 20`). Then `k` lines, each starting with a " +
+      "type `B` (book) or `T` (tape). A `B` line is `B title price page_count`, " +
+      "a `T` line is `T title price time_in_minutes`. `title` is a single " +
+      "word, `price` and `time_in_minutes` are real numbers, and `page_count` " +
+      "is an integer.",
+    output:
+      "Print exactly one line per publication, in input order. A book prints " +
+      "`Book Title: <title> Price: <price> Pages: <page_count>`. A tape prints " +
+      "`Tape Title: <title> Price: <price> Time: <time_in_minutes>`. Every " +
+      "`price` and `time_in_minutes` is rounded to 2 decimal places.",
+    examples: [
+      {
+        input: "2\nB Dune 250 412\nT Jazz 99.5 45.25",
+        output:
+          "Book Title: Dune Price: 250.00 Pages: 412\nTape Title: Jazz Price: 99.50 Time: 45.25",
+      },
+    ],
+    starterCode: SHELL_STRING,
+    tests: [
+      {
+        input: "1\nB Dune 250 412",
+        expected: "Book Title: Dune Price: 250.00 Pages: 412",
+      },
+      {
+        input: "1\nT Jazz 99.5 45.25",
+        expected: "Tape Title: Jazz Price: 99.50 Time: 45.25",
+      },
+      {
+        input: "2\nB Dune 250 412\nT Jazz 99.5 45.25",
+        expected:
+          "Book Title: Dune Price: 250.00 Pages: 412\nTape Title: Jazz Price: 99.50 Time: 45.25",
+      },
+      { input: "1\nB Free 0 0", expected: "Book Title: Free Price: 0.00 Pages: 0" },
+      {
+        input: "2\nT A 1 0\nB B 2 3",
+        expected:
+          "Tape Title: A Price: 1.00 Time: 0.00\nBook Title: B Price: 2.00 Pages: 3",
+      },
+    ],
+    hint:
+      "Since the program reads from stdin without prompts, have `getdata()` " +
+      "read the remaining fields for its own type (the leading `B`/`T` picks " +
+      "which object to create), and keep the objects in an array of " +
+      "`publication*`.",
   },
 ];
-
-export const DIFFICULTIES = ["easy", "medium", "hard"];

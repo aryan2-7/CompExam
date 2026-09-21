@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import TopBar from "./components/TopBar.jsx";
-import DifficultyTabs from "./components/DifficultyTabs.jsx";
+import FilterBar from "./components/FilterBar.jsx";
 import QuestionList from "./components/QuestionList.jsx";
 import QuestionPanel from "./components/QuestionPanel.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
@@ -26,8 +26,21 @@ function countByDifficulty() {
   return counts;
 }
 
+function allYears() {
+  const set = new Set();
+  for (const q of QUESTIONS) for (const y of q.years ?? []) set.add(y);
+  return [...set].sort((a, b) => b - a);
+}
+
+function countByYear() {
+  const counts = { all: QUESTIONS.length };
+  for (const q of QUESTIONS) for (const y of q.years ?? []) counts[y] = (counts[y] ?? 0) + 1;
+  return counts;
+}
+
 export default function App() {
-  const [tab, setTab] = useState(() => loadJSON(KEYS.tab, "all"));
+  const [year, setYear] = useState(() => loadJSON(KEYS.year, "all"));
+  const [difficulty, setDifficulty] = useState(() => loadJSON(KEYS.difficulty, "all"));
   const [currentId, setCurrentId] = useState(() => loadJSON(KEYS.current, QUESTIONS[0]?.id));
   const [solved, setSolved] = useState(() => loadJSON(KEYS.solved, []));
   const [code, setCode] = useState(() => loadCode(currentId) ?? QUESTIONS[0]?.starterCode ?? "");
@@ -47,14 +60,21 @@ export default function App() {
   const moodRef = useRef(mood);
   moodRef.current = mood;
 
-  const filtered = tab === "all" ? QUESTIONS : QUESTIONS.filter((q) => q.difficulty === tab);
+  const filtered = QUESTIONS.filter(
+    (q) =>
+      (difficulty === "all" || q.difficulty === difficulty) &&
+      (year === "all" || (q.years ?? []).includes(Number(year)))
+  );
   const currentQuestion =
     QUESTIONS.find((q) => q.id === currentId) ?? filtered[0] ?? QUESTIONS[0];
   const qIndex = filtered.findIndex((q) => q.id === currentQuestion.id);
-  const counts = countByDifficulty();
+  const diffCounts = countByDifficulty();
+  const years = allYears();
+  const yearCounts = countByYear();
 
   // ---- persistence helpers ----
-  useEffect(() => saveJSON(KEYS.tab, tab), [tab]);
+  useEffect(() => saveJSON(KEYS.year, year), [year]);
+  useEffect(() => saveJSON(KEYS.difficulty, difficulty), [difficulty]);
   useEffect(() => saveJSON(KEYS.current, currentId), [currentId]);
   useEffect(() => saveJSON(KEYS.solved, solved), [solved]);
 
@@ -111,10 +131,13 @@ export default function App() {
     setHintOpen(false);
   };
 
-  const changeTab = (next) => {
+  const applyFilters = (nextYear, nextDifficulty) => {
     bumpActive();
-    setTab(next);
-    const qs = next === "all" ? QUESTIONS : QUESTIONS.filter((q) => q.difficulty === next);
+    const qs = QUESTIONS.filter(
+      (q) =>
+        (nextDifficulty === "all" || q.difficulty === nextDifficulty) &&
+        (nextYear === "all" || (q.years ?? []).includes(Number(nextYear)))
+    );
     if (qs.length && !qs.some((q) => q.id === currentId)) {
       const first = qs[0];
       setCurrentId(first.id);
@@ -123,6 +146,16 @@ export default function App() {
       setLines([]);
       setHintOpen(false);
     }
+  };
+
+  const changeYear = (next) => {
+    setYear(next);
+    applyFilters(next, difficulty);
+  };
+
+  const changeDifficulty = (next) => {
+    setDifficulty(next);
+    applyFilters(year, next);
   };
 
   const handleCodeChange = (value) => {
@@ -252,7 +285,15 @@ export default function App() {
 
       <main className="layout">
         <div className="left-col">
-          <DifficultyTabs tab={tab} counts={counts} onChange={changeTab} />
+          <FilterBar
+            year={year}
+            difficulty={difficulty}
+            years={years}
+            yearCounts={yearCounts}
+            diffCounts={diffCounts}
+            onYearChange={changeYear}
+            onDifficultyChange={changeDifficulty}
+          />
           <QuestionList
             questions={filtered}
             currentId={currentQuestion.id}

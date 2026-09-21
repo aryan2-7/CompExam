@@ -2,7 +2,8 @@
 const KEYS = {
   solved: "compexamexe_solved",
   current: "compexamexe_current",
-  tab: "compexamexe_tab",
+  year: "compexamexe_year",
+  difficulty: "compexamexe_difficulty",
 };
 
 export const codeKey = (id) => `compexamexe_code_${id}`;
