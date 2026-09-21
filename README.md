@@ -5,8 +5,10 @@ difficulty filters, an in-browser code editor, and real C++ execution against
 hidden test cases.
 
 Will be adding:
-- Questions from PYQs
+- [x] Questions from PYQs
+- Add a button to see the output of ur code without haveing to submit it
 - Maybe a theory tab too that verifies the answer with a comp-specific ai thats given the class slides
+- 
 
 Feel free to raise an issue for any feature request
 
