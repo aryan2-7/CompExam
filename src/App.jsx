@@ -8,6 +8,7 @@ import Cat from "./components/Cat.jsx";
 import Toast from "./components/Toast.jsx";
 import { QUESTIONS } from "./data/questions.js";
 import { executeCode } from "./lib/execute.js";
+import { normalizeStdin, outputsMatch } from "./lib/compare.js";
 import { KEYS, loadCode, loadJSON, saveCode, saveJSON } from "./lib/storage.js";
 
 const CAT_LINES = {
@@ -203,7 +204,7 @@ export default function App() {
     for (let i = 0; i < q.tests.length; i++) {
       const test = q.tests[i];
       try {
-        const res = await executeCode(code, test.input);
+        const res = await executeCode(code, normalizeStdin(test.input));
 
         if (res.compile && res.compile.code !== 0) {
           addLine({ kind: "verdict", passed: false, text: "COMPILE ERROR" });
@@ -213,9 +214,9 @@ export default function App() {
           break;
         }
 
-        const actual = (res.run.stdout || "").trim();
-        const expected = test.expected.trim();
-        const passed = actual === expected;
+        const actual = res.run.stdout || "";
+        const expected = test.expected;
+        const passed = outputsMatch(actual, expected);
 
         results.push(passed);
         setPips((prev) => {
@@ -229,9 +230,10 @@ export default function App() {
           text: `${passed ? "✓" : "✗"} test ${i + 1} — input: ${test.input}`,
         });
         if (!passed) {
+          const shownActual = (actual || "").trim() || "(empty)";
           addLine({
             kind: "detail",
-            text: `expected "${test.expected}", got "${actual || "(empty)"}"${
+            text: `expected "${expected}", got "${shownActual}"${
               res.run.stderr ? "\n" + res.run.stderr.trim() : ""
             }`,
           });
