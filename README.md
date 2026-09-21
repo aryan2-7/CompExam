@@ -4,6 +4,13 @@ A C++ lab exam practice site. It provides a question bank with difficulty
 tabs, an in-browser code editor, and real C++ execution against hidden test
 cases.
 
+Will be adding:
+- Questions from PYQs
+- Maybe a theory tab too that verifies the answer with a comp-specific ai thats given the class slides
+
+Feel free to raise an issue for any feature request
+
+
 Live: **https://aryan2-7.github.io/CompLabPass/**
 
 ## Features
