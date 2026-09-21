@@ -13,7 +13,7 @@ export default function TopBar({ solved, total }) {
         </div>
         <a
           className="github-link"
-          href="https://github.com/aryan2-7/CompLabPass"
+          href="https://github.com/aryan2-7/CompExam"
           target="_blank"
           rel="noreferrer"
           title="view source on github"
