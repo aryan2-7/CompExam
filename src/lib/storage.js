@@ -1,11 +1,11 @@
 // Thin wrapper around localStorage so all persistence lives in one place.
 const KEYS = {
-  solved: "lateexe_solved",
-  current: "lateexe_current",
-  tab: "lateexe_tab",
+  solved: "compexamexe_solved",
+  current: "compexamexe_current",
+  tab: "compexamexe_tab",
 };
 
-export const codeKey = (id) => `lateexe_code_${id}`;
+export const codeKey = (id) => `compexamexe_code_${id}`;
 
 export function loadJSON(key, fallback) {
   try {

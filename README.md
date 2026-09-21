@@ -1,4 +1,4 @@
-# CompLab.exe
+# CompExam.exe
 
 A C++ lab exam practice site. It provides a question bank with difficulty
 tabs, an in-browser code editor, and real C++ execution against hidden test
