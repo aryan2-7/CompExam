@@ -11,7 +11,7 @@ Will be adding:
 Feel free to raise an issue for any feature request
 
 
-Live: **https://aryan2-7.github.io/CompLabPass/**
+Live: **https://aryan2-7.github.io/CompExam/**
 
 ## Features
 - 28-question PYQ bank filterable by year and difficulty, with paper source badges and repeated-question tags
