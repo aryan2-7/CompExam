@@ -46,6 +46,7 @@ export default function App() {
   const [solved, setSolved] = useState(() => loadJSON(KEYS.solved, []));
   const [code, setCode] = useState(() => loadCode(currentId) ?? QUESTIONS[0]?.starterCode ?? "");
   const [running, setRunning] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [pips, setPips] = useState([]);
   const [lines, setLines] = useState([]);
   const [mood, setMood] = useState("idle");
@@ -178,8 +179,65 @@ export default function App() {
     setHintOpen((v) => !v);
   };
 
-  // ---- run ----
-  const handleRun = async () => {
+  // ---- run (single execution, shows program output) ----
+  const handleRun = async (stdinInput = "") => {
+    bumpActive();
+    if (!code.trim()) {
+      showToast("write some code first");
+      setShaking(true);
+      setTimeout(() => setShaking(false), 450);
+      return;
+    }
+
+    setRunning(true);
+    setLines([]);
+    catSay(CAT_LINES.running, 4000);
+    setCatMood("running");
+
+    const addLine = (line) => setLines((prev) => [...prev, line]);
+
+    try {
+      const res = await executeCode(code, normalizeStdin(stdinInput ?? ""));
+
+      if (res.compile && res.compile.code !== 0) {
+        addLine({ kind: "verdict", passed: false, text: "COMPILE ERROR" });
+        addLine({ kind: "compile", text: res.compile.output || "unknown compiler error" });
+        setCatMood("error", 3000);
+        catSay(CAT_LINES.error, 3000);
+        return;
+      }
+
+      const stdinShown = (stdinInput ?? "").trim();
+      if (stdinShown) {
+        addLine({ kind: "stdin", text: stdinShown });
+      }
+
+      const stdout = res.run.stdout ?? "";
+      if (stdout.trim()) {
+        addLine({ kind: "output", text: stdout });
+      } else {
+        addLine({ kind: "empty", text: "(no output — program produced nothing)" });
+      }
+
+      if (res.run.stderr && res.run.stderr.trim()) {
+        addLine({ kind: "detail", text: res.run.stderr.trim() });
+      }
+
+      setCatMood("idle");
+    } catch (err) {
+      addLine({
+        kind: "error",
+        text: `network error: ${err.message}. check your connection and try again.`,
+      });
+      setCatMood("fail", 2600);
+      catSay(CAT_LINES.fail);
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  // ---- submit (runs all hidden tests) ----
+  const handleSubmit = async () => {
     bumpActive();
     if (!code.trim()) {
       showToast("write some code first");
@@ -189,7 +247,7 @@ export default function App() {
     }
 
     const q = currentQuestion;
-    setRunning(true);
+    setSubmitting(true);
     setPips(q.tests.map(() => "pending"));
     setLines([]);
     catSay(CAT_LINES.running, 4000);
@@ -244,14 +302,14 @@ export default function App() {
           text: `network error: ${err.message}. check your connection and try again.`,
         });
         clearPips();
-        setRunning(false);
+        setSubmitting(false);
         setCatMood("fail", 2600);
         catSay(CAT_LINES.fail);
         return;
       }
     }
 
-    setRunning(false);
+    setSubmitting(false);
 
     if (compileErrorShown) {
       setCatMood("error", 3000);
@@ -315,8 +373,10 @@ export default function App() {
           code={code}
           onChange={handleCodeChange}
           onRun={handleRun}
+          onSubmit={handleSubmit}
           onReset={handleReset}
           running={running}
+          submitting={submitting}
           pips={pips}
           lines={lines}
           shaking={shaking}

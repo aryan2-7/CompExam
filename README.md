@@ -6,7 +6,7 @@ hidden test cases.
 
 Will be adding:
 - [x] Questions from PYQs
-- **Doing** Add a button to see the output of ur code without haveing to submit it
+- [x] Add a button to see the output of ur code without haveing to submit it
 - Maybe a theory tab too that verifies the answer with a comp-specific ai thats given the class slides
 - 
 

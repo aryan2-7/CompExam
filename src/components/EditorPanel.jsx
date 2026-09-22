@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // Pairs that auto-close, and the full set of closing chars we allow "skip over" for.
 const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
@@ -23,8 +23,10 @@ export default function EditorPanel({
   code,
   onChange,
   onRun,
+  onSubmit,
   onReset,
   running,
+  submitting,
   pips,
   lines,
   shaking,
@@ -46,6 +48,17 @@ export default function EditorPanel({
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [menuPos, setMenuPos] = useState(null);
+
+  // Custom stdin for plain RUN (so `cin` programs can be fed input).
+  // Defaults to the first example's input for the current question.
+  const [stdin, setStdin] = useState(() => question?.examples?.[0]?.input ?? "");
+  const [showStdinHelp, setShowStdinHelp] = useState(false);
+  useEffect(() => {
+    setStdin(question?.examples?.[0]?.input ?? "");
+    setShowStdinHelp(false);
+  }, [question?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const busy = running || submitting;
 
   useLayoutEffect(() => {
     const sel = pendingSelection.current;
@@ -398,26 +411,117 @@ export default function EditorPanel({
         )}
       </div>
 
+      <div className="stdin-wrap">
+        <div className="stdin-head">
+          <label className="stdin-label" htmlFor="stdin-input">
+            STDIN <span className="stdin-hint">(input for cin — optional)</span>
+          </label>
+          <div
+            className="stdin-help"
+            onMouseEnter={() => setShowStdinHelp(true)}
+            onMouseLeave={() => setShowStdinHelp(false)}
+          >
+            <button
+              type="button"
+              className="stdin-help-btn"
+              aria-label="What is STDIN?"
+              aria-expanded={showStdinHelp}
+              onClick={() => setShowStdinHelp((v) => !v)}
+              onBlur={() => setShowStdinHelp(false)}
+            >
+              ?
+            </button>
+            {showStdinHelp && (
+              <div className="stdin-tooltip" role="tooltip">
+                Your program can&apos;t ask you for input while it runs, so type
+                everything <code>cin</code> needs here before pressing RUN. Put
+                one value per line. The 1st line goes to the 1st cin, the 2nd
+                line to the 2nd cin, and so on. SUBMIT ignores this box and
+                uses hidden tests.
+              </div>
+            )}
+          </div>
+        </div>
+        <textarea
+          id="stdin-input"
+          className="stdin-input"
+          spellCheck={false}
+          placeholder="e.g. 10"
+          value={stdin}
+          onChange={(e) => setStdin(e.target.value)}
+          rows={5}
+          aria-label="standard input for running code"
+        />
+      </div>
+
       <div className="run-row">
-        <button
-          className={`run-btn ${shaking ? "shake" : ""}`}
-          onClick={onRun}
-          disabled={running}
-        >
-          <span className={`run-btn-label ${running ? "hidden" : ""}`}>▶ RUN</span>
-          <span className={`run-btn-loading ${running ? "" : "hidden"}`}>
-            compiling
-            <span className="dots">
-              <span>.</span>
-              <span>.</span>
-              <span>.</span>
-            </span>
-          </span>
-        </button>
-        <div className="test-pips">
-          {pips.map((state, i) => (
-            <div key={i} className={`pip ${state}`} data-test={i} />
-          ))}
+        <div className="run-actions run-actions-left">
+          <button
+            className={`run-btn ${shaking ? "shake" : ""}`}
+            onClick={() => onRun(stdin)}
+            disabled={busy}
+            title="Run code and show output"
+          >
+            {running ? (
+              <span className="run-btn-loading">
+                compiling
+                <span className="dots">
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </span>
+              </span>
+            ) : (
+              <span className="run-btn-label">
+                <svg className="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M4 2.5v11l9-5.5z" fill="currentColor" />
+                </svg>
+                RUN
+              </span>
+            )}
+          </button>
+        </div>
+        <div className="run-actions run-actions-right">
+          <button
+            className="submit-btn"
+            onClick={onSubmit}
+            disabled={busy}
+            title="Submit code against all tests"
+          >
+            {submitting ? (
+              <span className="run-btn-loading">
+                testing
+                <span className="dots">
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </span>
+              </span>
+            ) : (
+              <span className="run-btn-label">
+                <svg
+                  className="btn-icon"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M8 10.5V2" />
+                  <path d="M4.5 5.5 8 2l3.5 3.5" />
+                  <path d="M2.5 10.5v3h11v-3" />
+                </svg>
+                SUBMIT
+              </span>
+            )}
+          </button>
+          <div className="test-pips">
+            {pips.map((state, i) => (
+              <div key={i} className={`pip ${state}`} data-test={i} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -449,6 +553,17 @@ function ConsoleLine({ line }) {
       return <div className="compile-error">{line.text}</div>;
     case "error":
       return <div className="compile-error">{line.text}</div>;
+    case "output":
+      return <pre className="program-output">{line.text}</pre>;
+    case "stdin":
+      return (
+        <div className="stdin-echo">
+          <span className="stdin-echo-label">stdin ›</span>
+          <pre>{line.text}</pre>
+        </div>
+      );
+    case "empty":
+      return <div className="console-placeholder">{line.text}</div>;
     default:
       return null;
   }

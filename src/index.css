@@ -1,5 +1,6 @@
 /* ============ TOKENS ============ */
 :root {
+  color-scheme: dark;
   --bg: #0a0b14;
   --bg-deep: #05060c;
   --panel: #12142380;
@@ -484,7 +485,7 @@ body {
 
 .code-input {
   width: 100%;
-  min-height: 320px;
+  min-height: 440px;
   background: #0d0e1a;
   color: var(--text);
   border: none;
@@ -560,9 +561,201 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 14px 20px;
   background: var(--panel-solid);
   border-bottom: 1px solid var(--panel-border);
+  flex-wrap: wrap;
+}
+
+.run-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.run-actions-right {
+  margin-left: auto;
+  gap: 14px;
+}
+
+.run-btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.run-btn-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.submit-btn {
+  font-family: var(--pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  background: var(--accent);
+  color: #0a0b14;
+  border: none;
+  padding: 12px 22px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 0 var(--accent-dim);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  min-width: 130px;
+}
+
+.submit-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--accent-dim);
+}
+
+.submit-btn:disabled { opacity: 0.7; cursor: wait; }
+
+/* ---- stdin input ---- */
+.stdin-wrap {
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--panel-border);
+  padding: 12px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stdin-label {
+  font-family: var(--pixel);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.stdin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stdin-help {
+  position: relative;
+  display: inline-flex;
+}
+
+.stdin-help-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 2px;
+  border: 2px solid #8a5a2b;
+  background: transparent;
+  color: #8a5a2b;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.stdin-help-btn:hover,
+.stdin-help-btn:focus-visible {
+  background: #8a5a2b;
+  color: #0a0b14;
+  outline: none;
+}
+
+.stdin-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--panel-solid);
+  border: 1px solid var(--accent-dim);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 10px 12px;
+  border-radius: 4px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  z-index: 30;
+}
+
+.stdin-tooltip code {
+  color: var(--accent);
+}
+
+.stdin-hint {
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+}
+
+.stdin-input {
+  width: 100%;
+  background: #0d0e1a;
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  min-height: 92px;
+}
+
+.stdin-input:focus { border-color: var(--accent-dim); }
+
+/* ---- plain run output ---- */
+.program-output {
+  background: #0d0e1a;
+  border: 1px solid var(--panel-border);
+  border-left: 2px solid var(--good-dim);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.7;
+  padding: 10px 14px;
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.stdin-echo {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.stdin-echo-label {
+  font-family: var(--pixel);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.stdin-echo pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #ffffff08;
+  border: 1px solid var(--panel-border);
+  padding: 6px 10px;
+  flex: 1;
 }
 
 .run-btn {
@@ -851,11 +1044,51 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ============ SCROLLBAR ============ */
+/* ============ SCROLLBAR + RESIZE HANDLES ============ */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #0d0e1a; }
 ::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+::-webkit-scrollbar-corner { background: #0d0e1a; }
+
+/* Theme the textarea resize grips + scrollbars orange so the native white
+   controls don't stick out against the dark editor. */
+.code-input,
+.stdin-input,
+.console-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) #0d0e1a;
+}
+
+.code-input::-webkit-scrollbar-thumb,
+.stdin-input::-webkit-scrollbar-thumb,
+.console-body::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+  border-radius: 4px;
+}
+
+.code-input::-webkit-scrollbar-thumb:hover,
+.stdin-input::-webkit-scrollbar-thumb:hover,
+.console-body::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.code-input::-webkit-resizer,
+.stdin-input::-webkit-resizer {
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 45%,
+    var(--accent) 45%,
+    var(--accent) 55%,
+    transparent 55%,
+    transparent 70%,
+    var(--accent-dim) 70%,
+    var(--accent-dim) 80%,
+    transparent 80%
+  );
+  border-bottom-right-radius: 2px;
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
