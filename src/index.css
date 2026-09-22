@@ -293,8 +293,42 @@ body {
 .filter-bar.theory-filters { flex-wrap: nowrap; }
 
 .filter-bar.theory-filters .filter-field {
+  min-width: 0;
+}
+
+/* YEAR is short — lock it to its content size and never let it shrink,
+   so values like "2025 (7)" always show in full. */
+.filter-bar.theory-filters .filter-field:first-child {
+  flex: 0 0 auto;
+}
+
+/* Hide the native dropdown arrow on the theory YEAR select only. */
+.filter-bar.theory-filters .filter-field:first-child .filter-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 0;
+  flex: 0 0 auto;
+  max-width: none;
+}
+
+.filter-bar.theory-filters .filter-field:first-child .filter-select::-ms-expand {
+  display: none;
+}
+
+.filter-bar.theory-filters .filter-field:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* TOPIC absorbs all the squeeze — long names truncate instead of
+   stealing space from YEAR. */
+.filter-bar.theory-filters .filter-field:last-child .filter-select {
   flex: 1;
   min-width: 0;
+  max-width: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Keep YEAR + DIFFICULTY on one row on the coding tab too, and shrink
@@ -302,8 +336,17 @@ body {
 .filter-bar.coding-filters { flex-wrap: nowrap; }
 
 .filter-bar.coding-filters .filter-field {
-  flex: 1;
   min-width: 0;
+}
+
+/* YEAR is short — give it less room so DIFFICULTY (with its count)
+   has space and doesn't get cut off. Row still fills the same width. */
+.filter-bar.coding-filters .filter-field:first-child {
+  flex: 0 1 calc(32% + 60px);
+}
+
+.filter-bar.coding-filters .filter-field:last-child {
+  flex: 1 1 68%;
 }
 
 .filter-bar.coding-filters .filter-select {
