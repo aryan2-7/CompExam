@@ -1,9 +1,25 @@
 // Renders text where `code` is wrapped in <code> tags.
+// Long / multi-line snippets become block <pre> code for readability,
+// short tokens stay inline.
+export function isBlockCode(part) {
+  return part.includes("\n") || part.length > 60 || /[{};]/.test(part);
+}
+
 export function inlineCode(text) {
-  const parts = text.split("`");
-  return parts.map((part, i) =>
-    i % 2 === 1 ? <code key={i}>{part}</code> : <span key={i}>{part}</span>
-  );
+  const parts = String(text ?? "").split("`");
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      if (isBlockCode(part)) {
+        return (
+          <pre key={i} className="mcq-code-block">
+            <code>{part.trim()}</code>
+          </pre>
+        );
+      }
+      return <code key={i}>{part}</code>;
+    }
+    return <span key={i}>{part}</span>;
+  });
 }
 
 export default function QuestionPanel({ question, index, onHintToggle, hintOpen }) {

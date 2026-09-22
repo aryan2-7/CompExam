@@ -1297,6 +1297,92 @@ body {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  flex: 1;
+  min-width: 0;
+}
+
+.mcq-qtext code {
+  background: #ffffff12;
+  border: 1px solid var(--panel-border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.mcq-code-block {
+  display: block;
+  width: 100%;
+  background: #0d0e1a;
+  border: 1px solid var(--panel-border);
+  border-left: 2px solid var(--accent-dim);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin: 10px 0 4px;
+  white-space: pre;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.mcq-code-block code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: inherit;
+}
+
+.mcq-flag-wrap {
+  position: relative;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.mcq-flag-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: #e8a33d14;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.mcq-flag-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--panel-solid);
+  border: 1px solid var(--accent-dim);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 10px 12px;
+  border-radius: 4px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  white-space: normal;
+}
+
+.mcq-flag-tip code {
+  color: var(--accent);
+}
+
+.mcq-flag-wrap:hover .mcq-flag-tip,
+.mcq-flag-btn:focus + .mcq-flag-tip {
+  display: block;
 }
 
 .mcq-options {

@@ -21,7 +21,9 @@ export default function McqView({ onCorrect, onWrong }) {
   );
 
   const answered = questions.filter((q) => answers[q.id] !== undefined);
-  const correct = answered.filter((q) => answers[q.id] === q.answerIndex);
+  const correct = answered.filter(
+    (q) => !q.allWrong && answers[q.id] === q.answerIndex
+  );
 
   const selectOption = (id, index) => {
     if (answers[id] !== undefined) return;
@@ -29,7 +31,8 @@ export default function McqView({ onCorrect, onWrong }) {
       prev[id] !== undefined ? prev : { ...prev, [id]: index }
     );
     const q = questions.find((x) => x.id === id);
-    if (q && index === q.answerIndex) onCorrect?.();
+    // Disputed questions (all listed options wrong) never count as correct.
+    if (q && !q.allWrong && index === q.answerIndex) onCorrect?.();
     else onWrong?.();
   };
 
@@ -105,19 +108,40 @@ export default function McqView({ onCorrect, onWrong }) {
 
 function McqCard({ question, number, selected, onSelect, onRetry }) {
   const locked = selected !== undefined;
-  const isCorrect = locked && selected === question.answerIndex;
+  const isDisputed = !!question.allWrong;
+  const isCorrect = locked && !isDisputed && selected === question.answerIndex;
 
   return (
     <article className="mcq-card">
       <div className="mcq-q">
         <span className="mcq-qnum">{String(number).padStart(2, "0")}</span>
-        <p className="mcq-qtext">{inlineCode(question.body)}</p>
+        <div className="mcq-qtext">
+          {inlineCode(question.body)}
+          {isDisputed && (
+            <span className="mcq-flag-wrap">
+              <button
+                className="mcq-flag-btn"
+                type="button"
+                aria-label="disputed answer note"
+              >
+                ?
+              </button>
+              <span className="mcq-flag-tip" role="tooltip">
+                {question.disputedNote ??
+                  "All listed options are incorrect."}{" "}
+                {question.trueAnswer && (
+                  <>Correct output: <code>{question.trueAnswer}</code></>
+                )}
+              </span>
+            </span>
+          )}
+        </div>
       </div>
       <div className="mcq-options" role="group" aria-label={`options for question ${number}`}>
         {question.options.map((opt, i) => {
           let cls = "mcq-option";
           if (locked) {
-            if (i === question.answerIndex) cls += " correct";
+            if (!isDisputed && i === question.answerIndex) cls += " correct";
             else if (i === selected) cls += " wrong";
             else cls += " dimmed";
           }
@@ -130,10 +154,10 @@ function McqCard({ question, number, selected, onSelect, onRetry }) {
             >
               <span className="mcq-letter">{LETTERS[i]}</span>
               <span className="mcq-opt-text">{inlineCode(opt)}</span>
-              {locked && i === question.answerIndex && (
+              {locked && !isDisputed && i === question.answerIndex && (
                 <span className="mcq-mark">✓</span>
               )}
-              {locked && i === selected && selected !== question.answerIndex && (
+              {locked && i === selected && (
                 <span className="mcq-mark">✗</span>
               )}
             </button>
@@ -142,7 +166,12 @@ function McqCard({ question, number, selected, onSelect, onRetry }) {
       </div>
       {locked && (
         <div className={`mcq-feedback${isCorrect ? " pass" : " fail"}`}>
-          {isCorrect ? (
+          {isDisputed ? (
+            <span>
+              ✗ all listed options are wrong — correct:{" "}
+              <code>{question.trueAnswer}</code>
+            </span>
+          ) : isCorrect ? (
             <span>✓ correct</span>
           ) : (
             <span>
