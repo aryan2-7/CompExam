@@ -10,15 +10,31 @@ export default function McqView({ onCorrect, onWrong }) {
   const [session, setSession] = useState(
     () => loadJSON(KEYS.mcqSession, MCQ_SESSIONS[0])
   );
-  const [answers, setAnswers] = useState({});
+  const [answersBySession, setAnswersBySession] = useState(() => {
+    const raw = loadJSON(KEYS.mcqAnswers, {});
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+    // Keep only { [session]: { [id]: choiceIndex } } with numeric choices.
+    const clean = {};
+    for (const [s, v] of Object.entries(raw)) {
+      if (!v || typeof v !== "object" || Array.isArray(v)) continue;
+      const entries = Object.entries(v).filter(
+        ([, choice]) => Number.isInteger(choice)
+      );
+      if (entries.length) clean[s] = Object.fromEntries(entries);
+    }
+    return clean;
+  });
 
   useEffect(() => saveJSON(KEYS.mcqSession, session), [session]);
+  useEffect(() => saveJSON(KEYS.mcqAnswers, answersBySession), [answersBySession]);
 
   const counts = useMemo(countBySession, []);
   const questions = useMemo(
     () => MCQ_QUESTIONS.filter((q) => q.session === session),
     [session]
   );
+
+  const answers = answersBySession[session] ?? {};
 
   const answered = questions.filter((q) => answers[q.id] !== undefined);
   const correct = answered.filter(
@@ -27,9 +43,12 @@ export default function McqView({ onCorrect, onWrong }) {
 
   const selectOption = (id, index) => {
     if (answers[id] !== undefined) return;
-    setAnswers((prev) =>
-      prev[id] !== undefined ? prev : { ...prev, [id]: index }
-    );
+    // Store only attempted questions { [id]: choiceIndex }, grouped by session.
+    setAnswersBySession((prev) => {
+      const sessionAnswers = prev[session] ?? {};
+      if (sessionAnswers[id] !== undefined) return prev;
+      return { ...prev, [session]: { ...sessionAnswers, [id]: index } };
+    });
     const q = questions.find((x) => x.id === id);
     // Disputed questions (all listed options wrong) never count as correct.
     if (q && !q.allWrong && index === q.answerIndex) onCorrect?.();
@@ -37,17 +56,25 @@ export default function McqView({ onCorrect, onWrong }) {
   };
 
   const retryQuestion = (id) => {
-    setAnswers((prev) => {
-      const next = { ...prev };
+    setAnswersBySession((prev) => {
+      const sessionAnswers = prev[session];
+      if (!sessionAnswers || sessionAnswers[id] === undefined) return prev;
+      const next = { ...sessionAnswers };
       delete next[id];
-      return next;
+      if (Object.keys(next).length === 0) {
+        const rest = { ...prev };
+        delete rest[session];
+        return rest;
+      }
+      return { ...prev, [session]: next };
     });
   };
 
   const resetSession = () => {
-    setAnswers((prev) => {
+    setAnswersBySession((prev) => {
+      if (!prev[session]) return prev;
       const next = { ...prev };
-      for (const q of questions) delete next[q.id];
+      delete next[session];
       return next;
     });
   };
