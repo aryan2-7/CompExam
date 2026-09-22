@@ -7,6 +7,7 @@ import QuestionList from "./components/QuestionList.jsx";
 import QuestionPanel from "./components/QuestionPanel.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
 import TheoryView from "./components/TheoryView.jsx";
+import McqView from "./components/McqView.jsx";
 import Cat from "./components/Cat.jsx";
 import Toast from "./components/Toast.jsx";
 import { QUESTIONS } from "./data/questions.js";
@@ -180,6 +181,19 @@ export default function App() {
   const handleHintToggle = () => {
     bumpActive();
     setHintOpen((v) => !v);
+  };
+
+  // ---- mcq (same cat reactions as a coding submit) ----
+  const handleMcqCorrect = () => {
+    bumpActive();
+    setCatMood("pass", 2600);
+    catSay(CAT_LINES.pass);
+  };
+
+  const handleMcqWrong = () => {
+    bumpActive();
+    setCatMood("fail", 2600);
+    catSay(CAT_LINES.fail);
   };
 
   // ---- run (single execution, shows program output) ----
@@ -393,6 +407,7 @@ export default function App() {
           }
         />
         <Route path="/theory" element={<TheoryView />} />
+        <Route path="/mcq" element={<McqView onCorrect={handleMcqCorrect} onWrong={handleMcqWrong} />} />
         <Route path="*" element={<Navigate to="/coding" replace />} />
       </Routes>
 

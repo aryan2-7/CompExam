@@ -15,7 +15,7 @@ export default function FilterBar({
   onDifficultyChange,
 }) {
   return (
-    <div className="filter-bar">
+    <div className="filter-bar coding-filters">
       <label className="filter-field">
         <span className="filter-label">YEAR</span>
         <select
