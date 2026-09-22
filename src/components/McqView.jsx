@@ -109,6 +109,7 @@ export default function McqView({ onCorrect, onWrong }) {
 function McqCard({ question, number, selected, onSelect, onRetry }) {
   const locked = selected !== undefined;
   const isDisputed = !!question.allWrong;
+  const hasNote = !!question.disputedNote;
   const isCorrect = locked && !isDisputed && selected === question.answerIndex;
 
   return (
@@ -117,18 +118,20 @@ function McqCard({ question, number, selected, onSelect, onRetry }) {
         <span className="mcq-qnum">{String(number).padStart(2, "0")}</span>
         <div className="mcq-qtext">
           {inlineCode(question.body)}
-          {isDisputed && (
+          {hasNote && (
             <span className="mcq-flag-wrap">
               <button
                 className="mcq-flag-btn"
                 type="button"
-                aria-label="disputed answer note"
+                aria-label="question note"
               >
                 ?
               </button>
               <span className="mcq-flag-tip" role="tooltip">
-                {question.disputedNote ??
-                  "All listed options are incorrect."}{" "}
+                {inlineCode(
+                  question.disputedNote ??
+                    "All listed options are incorrect."
+                )}{" "}
                 {question.trueAnswer && (
                   <>Correct output: <code>{question.trueAnswer}</code></>
                 )}
@@ -157,7 +160,7 @@ function McqCard({ question, number, selected, onSelect, onRetry }) {
               {locked && !isDisputed && i === question.answerIndex && (
                 <span className="mcq-mark">✓</span>
               )}
-              {locked && i === selected && (
+              {locked && i === selected && (isDisputed || i !== question.answerIndex) && (
                 <span className="mcq-mark">✗</span>
               )}
             </button>
