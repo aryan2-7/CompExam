@@ -196,7 +196,7 @@ const RAW = [
       ["Which is used to define the member of a class externally?", [":", "::", "#", "->"], 1, "certain"],
       ["Which of the following operators cannot be overloaded?", ["::", "+", "-", "[]"], 0, "certain"],
       ["Which of the following prototypes is the pre-increment operator overloading for a class Point?", ["Point Point++(int)", "int Point++()", "Point operator++()", "Point operator++(int)"], 2, "certain"],
-      ["In diamond problems there is an occurrence of", ["Multiple Inheritance.", "Multilevel inheritance.", "Multiple and Multilevel inheritance.", "Hierarchical Inheritance."], 0, "certain"],
+      ["In diamond problems there is an occurrence of", ["Multiple Inheritance.", "Multilevel inheritance.", "Multiple and Multilevel inheritance.", "Hierarchical Inheritance."], 2, "certain"],
       ["Exceptions are thrown", ["From the catch block to the try block.", "From a throw statement to the try block.", "From the point of the error to a catch block.", "From a throw statement to a catch block."], 3, "certain"],
       ["Pick out the CORRECT statement.", ["Constructors and destructors have void return type.", "A derived class's constructor cannot explicitly invoke its base class's Constructor.", "A derived class's destructor cannot invoke its base class's destructor.", "A derived class's destructor can invoke its base class's destructor."], 3, "certain"],
       ["Select the RIGHT option.\nStatement A: \"A definition is also a declaration.\"\nStatement B: \"An identifier can be declared just once.\"", ["Statement A is true, Statement B is false.", "Statement B is true, Statement A is false.", "Both are false.", "Both are true."], 0, "likely"],
