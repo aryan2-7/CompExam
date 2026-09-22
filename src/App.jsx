@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import TopBar from "./components/TopBar.jsx";
 import FilterBar from "./components/FilterBar.jsx";
+import ModeTabs from "./components/ModeTabs.jsx";
 import QuestionList from "./components/QuestionList.jsx";
 import QuestionPanel from "./components/QuestionPanel.jsx";
 import EditorPanel from "./components/EditorPanel.jsx";
+import TheoryView from "./components/TheoryView.jsx";
 import Cat from "./components/Cat.jsx";
 import Toast from "./components/Toast.jsx";
 import { QUESTIONS } from "./data/questions.js";
@@ -339,52 +342,62 @@ export default function App() {
   };
 
   return (
-    <>
+    <HashRouter>
       <div className="scanlines"></div>
       <TopBar solved={solved.length} total={QUESTIONS.length} />
 
-      <main className="layout">
-        <div className="left-col">
-          <FilterBar
-            year={year}
-            difficulty={difficulty}
-            years={years}
-            yearCounts={yearCounts}
-            diffCounts={diffCounts}
-            onYearChange={changeYear}
-            onDifficultyChange={changeDifficulty}
-          />
-          <QuestionList
-            questions={filtered}
-            currentId={currentQuestion.id}
-            solved={solved}
-            onSelect={selectQuestion}
-          />
-          <QuestionPanel
-            question={currentQuestion}
-            index={qIndex}
-            hintOpen={hintOpen}
-            onHintToggle={handleHintToggle}
-          />
-        </div>
+      <Routes>
+        <Route
+          path="/coding"
+          element={
+            <main className="layout">
+              <div className="left-col">
+                <ModeTabs />
+                <FilterBar
+                  year={year}
+                  difficulty={difficulty}
+                  years={years}
+                  yearCounts={yearCounts}
+                  diffCounts={diffCounts}
+                  onYearChange={changeYear}
+                  onDifficultyChange={changeDifficulty}
+                />
+                <QuestionList
+                  questions={filtered}
+                  currentId={currentQuestion.id}
+                  solved={solved}
+                  onSelect={selectQuestion}
+                />
+                <QuestionPanel
+                  question={currentQuestion}
+                  index={qIndex}
+                  hintOpen={hintOpen}
+                  onHintToggle={handleHintToggle}
+                />
+              </div>
 
-        <EditorPanel
-          question={currentQuestion}
-          code={code}
-          onChange={handleCodeChange}
-          onRun={handleRun}
-          onSubmit={handleSubmit}
-          onReset={handleReset}
-          running={running}
-          submitting={submitting}
-          pips={pips}
-          lines={lines}
-          shaking={shaking}
+              <EditorPanel
+                question={currentQuestion}
+                code={code}
+                onChange={handleCodeChange}
+                onRun={handleRun}
+                onSubmit={handleSubmit}
+                onReset={handleReset}
+                running={running}
+                submitting={submitting}
+                pips={pips}
+                lines={lines}
+                shaking={shaking}
+              />
+            </main>
+          }
         />
-      </main>
+        <Route path="/theory" element={<TheoryView />} />
+        <Route path="*" element={<Navigate to="/coding" replace />} />
+      </Routes>
 
       <Cat mood={mood} message={catMessage} />
       <Toast message={toast} />
-    </>
+    </HashRouter>
   );
 }

@@ -4,6 +4,9 @@ const KEYS = {
   current: "compexamexe_current",
   year: "compexamexe_year",
   difficulty: "compexamexe_difficulty",
+  theoryYear: "compexamexe_theory_year",
+  theoryTopic: "compexamexe_theory_topic",
+  theoryCurrent: "compexamexe_theory_current",
 };
 
 export const codeKey = (id) => `compexamexe_code_${id}`;
