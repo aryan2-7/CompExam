@@ -8,8 +8,7 @@ Will be adding:
 - [x] Questions from PYQs
 - [x] Add a button to see the output of ur code without haveing to submit it
 - [x] Add MCQs
-- Maybe a theory tab too that verifies the answer with a comp-specific ai thats given the class slides
-- 
+- [x] Add a theory tab 
 
 Feel free to raise an issue for any feature request
 
@@ -18,11 +17,13 @@ Live: **https://aryan2-7.github.io/CompExam/**
 
 ## Features
 - 28-question PYQ bank filterable by year and difficulty, with paper source badges and repeated-question tags
+- All QNs, **code-based**, **theory**, and **MCQs** are from PYQs
 - Runs each test case against your code and shows pass/fail per test
 - Animated pixel-art cat that reflects compile/run state (working, passed,
   failed, error) and falls asleep after inactivity
 - Progress tracking ("X/Y questions") that persists between visits
 - Per-question code autosave in localStorage
+
 
 ## How execution works
 The browser does not compile C++. Code is POSTed to tio.run, a free, keyless
