@@ -17,6 +17,13 @@ export default function ModeTabs() {
       >
         THEORY
       </NavLink>
+      <NavLink
+        to="/mcq"
+        className={({ isActive }) => `mode-tab${isActive ? " active" : ""}`}
+        role="tab"
+      >
+        MCQ
+      </NavLink>
     </div>
   );
 }

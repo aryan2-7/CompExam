@@ -297,13 +297,38 @@ body {
   min-width: 0;
 }
 
-.filter-bar.theory-filters .filter-select {
+/* Keep YEAR + DIFFICULTY on one row on the coding tab too, and shrink
+   things a bit on narrow phones so nothing wraps. */
+.filter-bar.coding-filters { flex-wrap: nowrap; }
+
+.filter-bar.coding-filters .filter-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-bar.coding-filters .filter-select {
   flex: 1;
   min-width: 0;
   max-width: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .filter-bar.coding-filters .filter-field,
+  .filter-bar.theory-filters .filter-field {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .filter-bar.coding-filters .filter-label,
+  .filter-bar.theory-filters .filter-label {
+    font-size: 8px;
+  }
+  .filter-bar.coding-filters .filter-select,
+  .filter-bar.theory-filters .filter-select {
+    font-size: 8px;
+  }
 }
 
 .theory-marks {
@@ -1170,3 +1195,172 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ============ MCQ TAB ============ */
+.q-item-num.mcq-num { color: var(--accent); }
+
+.q-list.mcq-session-list { max-height: max(640px, calc(100vh - 280px)); }
+
+.mcq-progress {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.mcq-reset {
+  background: none;
+  border: 1px dashed var(--panel-border);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-bottom: 18px;
+  transition: border-color 0.15s ease;
+}
+
+.mcq-reset:hover { border-color: var(--accent-dim); }
+
+.mcq-card {
+  background: var(--panel-solid);
+  border: 1px solid var(--panel-border);
+  border-radius: 3px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.mcq-card:last-child { margin-bottom: 0; }
+
+.mcq-q {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.mcq-qnum {
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--accent);
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.mcq-qtext {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mcq-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mcq-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0d0e1a;
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 3px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.mcq-option:hover:not(:disabled) { border-color: var(--accent-dim); }
+
+.mcq-option:disabled { cursor: default; }
+
+.mcq-letter {
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+  padding: 3px 7px;
+  flex-shrink: 0;
+}
+
+.mcq-opt-text { flex: 1; }
+
+.mcq-option.correct {
+  border-color: var(--good);
+  background: #7ee78714;
+}
+
+.mcq-option.correct .mcq-letter {
+  color: var(--good);
+  border-color: var(--good);
+}
+
+.mcq-option.wrong {
+  border-color: var(--bad);
+  background: #e85d5d14;
+}
+
+.mcq-option.wrong .mcq-letter {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.mcq-option.dimmed { opacity: 0.55; }
+
+.mcq-mark {
+  font-family: var(--pixel);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.mcq-option.correct .mcq-mark { color: var(--good); }
+.mcq-option.wrong .mcq-mark { color: var(--bad); }
+
+.mcq-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  margin-top: 12px;
+  padding: 9px 14px;
+  border-radius: 3px;
+  line-height: 1.6;
+}
+
+.mcq-feedback.pass {
+  color: var(--good);
+  background: #7ee78712;
+  border: 1px solid var(--good-dim);
+}
+
+.mcq-feedback.fail {
+  color: var(--bad);
+  background: #e85d5d12;
+  border: 1px solid var(--bad-dim);
+}
+
+.mcq-retry {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mcq-retry:hover { background: #ffffff0c; }
