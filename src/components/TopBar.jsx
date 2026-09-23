@@ -25,14 +25,8 @@ export default function TopBar({
     progress = `${theoryReviewed}/${theoryTotal} theory reviewed`;
     title = "theory questions reviewed";
   } else if (pathname.startsWith("/mcq")) {
-    title =
-      mcqDoneSessions.length > 0
-        ? `sessions done: ${mcqDoneSessions.join(", ")}`
-        : "mcq questions answered";
-    progress =
-      mcqDoneSessions.length > 0
-        ? `${mcqAnswered}/${mcqTotal} mcq · done: ${mcqDoneSessions.join(", ")}`
-        : `${mcqAnswered}/${mcqTotal} mcq`;
+    title = "mcq questions answered";
+    progress = `${mcqAnswered}/${mcqTotal} mcq`;
   } else {
     progress = `${coding.solved}/${coding.total} questions`;
   }

@@ -49,6 +49,17 @@ export default function McqView({
 
   const answers = answersState[session] ?? {};
 
+  const doneSessions = useMemo(() => {
+    const set = new Set();
+    for (const s of MCQ_SESSIONS) {
+      const qs = MCQ_QUESTIONS.filter((q) => q.session === s);
+      if (!qs.length) continue;
+      const ans = answersState[s] ?? {};
+      if (qs.every((q) => ans[q.id] !== undefined)) set.add(s);
+    }
+    return set;
+  }, [answersState]);
+
   const answered = questions.filter((q) => answers[q.id] !== undefined);
   const correct = answered.filter(
     (q) => !q.allWrong && answers[q.id] === q.answerIndex
@@ -101,17 +112,23 @@ export default function McqView({
       <div className="left-col">
         <ModeTabs />
         <nav className="q-list mcq-session-list" aria-label="mcq sessions">
-          {MCQ_SESSIONS.map((s) => (
-            <button
-              key={s}
-              className={`q-item${s === activeSession ? " active" : ""}`}
-              onClick={() => setSession(s)}
-            >
-              <span className="q-item-num mcq-num">▸</span>
-              <span className="q-item-title">{s}</span>
-              <span className="theory-marks">{counts[s] ?? 0}</span>
-            </button>
-          ))}
+          {MCQ_SESSIONS.map((s) => {
+            const done = doneSessions.has(s);
+            return (
+              <button
+                key={s}
+                className={`q-item${s === activeSession ? " active" : ""}${
+                  done ? " done" : ""
+                }`}
+                onClick={() => setSession(s)}
+              >
+                <span className="q-item-num mcq-num">▸</span>
+                <span className="q-item-title">{s}</span>
+                {done && <span className="q-item-check">✓</span>}
+                <span className="theory-marks">{counts[s] ?? 0}</span>
+              </button>
+            );
+          })}
         </nav>
       </div>
 
