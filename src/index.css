@@ -95,6 +95,13 @@ body {
   text-shadow: 0 0 8px #7ee78755;
 }
 
+.progress-truncate {
+  max-width: min(560px, 52vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
@@ -1493,3 +1500,26 @@ body {
 }
 
 .mcq-retry:hover { background: #ffffff0c; }
+
+/* ============ THEORY REVIEWED ============ */
+.review-toggle {
+  background: none;
+  border: 1px dashed var(--panel-border);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-top: 4px;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.review-toggle:hover { border-color: var(--accent-dim); }
+
+.review-toggle.reviewed {
+  color: var(--good);
+  border-color: var(--good-dim);
+  border-style: solid;
+  background: #7ee78712;
+}

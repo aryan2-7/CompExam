@@ -11,6 +11,8 @@ import McqView from "./components/McqView.jsx";
 import Cat from "./components/Cat.jsx";
 import Toast from "./components/Toast.jsx";
 import { QUESTIONS } from "./data/questions.js";
+import { THEORY_QUESTIONS } from "./data/theory.js";
+import { MCQ_QUESTIONS, MCQ_SESSIONS } from "./data/mcqs.js";
 import { executeCode } from "./lib/execute.js";
 import { normalizeStdin, outputsMatch } from "./lib/compare.js";
 import { KEYS, loadCode, loadJSON, saveCode, saveJSON } from "./lib/storage.js";
@@ -48,6 +50,22 @@ export default function App() {
   const [difficulty, setDifficulty] = useState(() => loadJSON(KEYS.difficulty, "all"));
   const [currentId, setCurrentId] = useState(() => loadJSON(KEYS.current, QUESTIONS[0]?.id));
   const [solved, setSolved] = useState(() => loadJSON(KEYS.solved, []));
+  const [theoryReviewed, setTheoryReviewed] = useState(() =>
+    loadJSON(KEYS.theoryReviewed, [])
+  );
+  const [mcqAnswers, setMcqAnswers] = useState(() => {
+    const raw = loadJSON(KEYS.mcqAnswers, {});
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+    const clean = {};
+    for (const [s, v] of Object.entries(raw)) {
+      if (!v || typeof v !== "object" || Array.isArray(v)) continue;
+      const entries = Object.entries(v).filter(([, choice]) =>
+        Number.isInteger(choice)
+      );
+      if (entries.length) clean[s] = Object.fromEntries(entries);
+    }
+    return clean;
+  });
   const [code, setCode] = useState(() => loadCode(currentId) ?? QUESTIONS[0]?.starterCode ?? "");
   const [running, setRunning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -83,6 +101,8 @@ export default function App() {
   useEffect(() => saveJSON(KEYS.difficulty, difficulty), [difficulty]);
   useEffect(() => saveJSON(KEYS.current, currentId), [currentId]);
   useEffect(() => saveJSON(KEYS.solved, solved), [solved]);
+  useEffect(() => saveJSON(KEYS.theoryReviewed, theoryReviewed), [theoryReviewed]);
+  useEffect(() => saveJSON(KEYS.mcqAnswers, mcqAnswers), [mcqAnswers]);
 
   // ---- cat helpers ----
   const bumpActive = () => {
@@ -183,7 +203,24 @@ export default function App() {
     setHintOpen((v) => !v);
   };
 
-  // ---- mcq (same cat reactions as a coding submit) ----
+  // ---- theory reviewed toggle ----
+  const toggleTheoryReviewed = (id) => {
+    bumpActive();
+    setTheoryReviewed((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // ---- mcq stats for the top bar ----
+  const mcqAnsweredCount = MCQ_QUESTIONS.filter(
+    (q) => mcqAnswers[q.session]?.[q.id] !== undefined
+  ).length;
+  const mcqDoneSessions = MCQ_SESSIONS.filter((s) => {
+    const qs = MCQ_QUESTIONS.filter((q) => q.session === s);
+    if (!qs.length) return false;
+    const ans = mcqAnswers[s] ?? {};
+    return qs.every((q) => ans[q.id] !== undefined);
+  });
   const handleMcqCorrect = () => {
     bumpActive();
     setCatMood("pass", 2600);
@@ -358,7 +395,15 @@ export default function App() {
   return (
     <HashRouter>
       <div className="scanlines"></div>
-      <TopBar solved={solved.length} total={QUESTIONS.length} />
+      <TopBar
+        codingSolved={solved.length}
+        codingTotal={QUESTIONS.length}
+        theoryReviewed={theoryReviewed.length}
+        theoryTotal={THEORY_QUESTIONS.length}
+        mcqAnswered={mcqAnsweredCount}
+        mcqTotal={MCQ_QUESTIONS.length}
+        mcqDoneSessions={mcqDoneSessions}
+      />
 
       <Routes>
         <Route
@@ -406,8 +451,23 @@ export default function App() {
             </main>
           }
         />
-        <Route path="/theory" element={<TheoryView />} />
-        <Route path="/mcq" element={<McqView onCorrect={handleMcqCorrect} onWrong={handleMcqWrong} />} />
+        <Route
+          path="/theory"
+          element={
+            <TheoryView reviewed={theoryReviewed} onToggleReviewed={toggleTheoryReviewed} />
+          }
+        />
+        <Route
+          path="/mcq"
+          element={
+            <McqView
+              answersBySession={mcqAnswers}
+              setAnswersBySession={setMcqAnswers}
+              onCorrect={handleMcqCorrect}
+              onWrong={handleMcqWrong}
+            />
+          }
+        />
         <Route path="*" element={<Navigate to="/coding" replace />} />
       </Routes>
 

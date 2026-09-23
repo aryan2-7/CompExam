@@ -23,7 +23,7 @@ function countByYear() {
   return counts;
 }
 
-export default function TheoryView() {
+export default function TheoryView({ reviewed = [], onToggleReviewed }) {
   const [year, setYear] = useState(() => loadJSON(KEYS.theoryYear, "all"));
   const [topic, setTopic] = useState(() => loadJSON(KEYS.theoryTopic, "all"));
   const [currentId, setCurrentId] = useState(
@@ -122,19 +122,23 @@ export default function TheoryView() {
           <p className="q-list-empty">no theory questions match this filter</p>
         ) : (
           <nav className="q-list theory-list" aria-label="theory questions">
-            {filtered.map((q, i) => (
-              <button
-                key={q.id}
-                className={`q-item${q.id === current.id ? " active" : ""}`}
-                onClick={() => selectAndEnsureVisible(q.id)}
-              >
-                <span className="q-item-num theory-num">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="q-item-title">{q.title}</span>
-                <span className="theory-marks">{q.marks}M</span>
-              </button>
-            ))}
+            {filtered.map((q, i) => {
+              const done = reviewed.includes(q.id);
+              return (
+                <button
+                  key={q.id}
+                  className={`q-item${q.id === current.id ? " active" : ""}${done ? " done" : ""}`}
+                  onClick={() => selectAndEnsureVisible(q.id)}
+                >
+                  <span className="q-item-num theory-num">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="q-item-title">{q.title}</span>
+                  <span className="q-item-check">{done ? "✓" : ""}</span>
+                  <span className="theory-marks">{q.marks}M</span>
+                </button>
+              );
+            })}
           </nav>
         )}
 
@@ -143,13 +147,18 @@ export default function TheoryView() {
       </div>
 
       <section className="panel question-panel">
-        <TheoryQuestionBody question={current} index={qIndex} />
+        <TheoryQuestionBody
+          question={current}
+          index={qIndex}
+          reviewed={reviewed.includes(current.id)}
+          onToggleReviewed={() => onToggleReviewed?.(current.id)}
+        />
       </section>
     </main>
   );
 }
 
-function TheoryQuestionBody({ question, index }) {
+function TheoryQuestionBody({ question, index, reviewed, onToggleReviewed }) {
   return (
     <>
       <div className="panel-tab">
@@ -166,6 +175,14 @@ function TheoryQuestionBody({ question, index }) {
         </div>
         <h1 className="q-title">{question.title}</h1>
         <p className="q-body">{inlineCode(question.body)}</p>
+        <button
+          type="button"
+          className={`review-toggle${reviewed ? " reviewed" : ""}`}
+          onClick={onToggleReviewed}
+          aria-pressed={!!reviewed}
+        >
+          {reviewed ? "✓ reviewed — click to unmark" : "mark as reviewed"}
+        </button>
       </div>
     </>
   );

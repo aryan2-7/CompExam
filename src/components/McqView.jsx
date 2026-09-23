@@ -6,11 +6,16 @@ import { KEYS, loadJSON, saveJSON } from "../lib/storage.js";
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
-export default function McqView({ onCorrect, onWrong }) {
+export default function McqView({
+  answersBySession,
+  setAnswersBySession,
+  onCorrect,
+  onWrong,
+}) {
   const [session, setSession] = useState(
     () => loadJSON(KEYS.mcqSession, MCQ_SESSIONS[0])
   );
-  const [answersBySession, setAnswersBySession] = useState(() => {
+  const [internalAnswers, setInternalAnswers] = useState(() => {
     const raw = loadJSON(KEYS.mcqAnswers, {});
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
     // Keep only { [session]: { [id]: choiceIndex } } with numeric choices.
@@ -25,8 +30,16 @@ export default function McqView({ onCorrect, onWrong }) {
     return clean;
   });
 
+  // Controlled from App when props are provided (so the TopBar can show
+  // live MCQ progress); otherwise fall back to internal localStorage state.
+  const controlled = answersBySession !== undefined && setAnswersBySession;
+  const answersState = controlled ? answersBySession : internalAnswers;
+  const setAnswersState = controlled ? setAnswersBySession : setInternalAnswers;
+
   useEffect(() => saveJSON(KEYS.mcqSession, session), [session]);
-  useEffect(() => saveJSON(KEYS.mcqAnswers, answersBySession), [answersBySession]);
+  useEffect(() => {
+    if (!controlled) saveJSON(KEYS.mcqAnswers, answersState);
+  }, [answersState, controlled]);
 
   const counts = useMemo(countBySession, []);
   const questions = useMemo(
@@ -34,7 +47,7 @@ export default function McqView({ onCorrect, onWrong }) {
     [session]
   );
 
-  const answers = answersBySession[session] ?? {};
+  const answers = answersState[session] ?? {};
 
   const answered = questions.filter((q) => answers[q.id] !== undefined);
   const correct = answered.filter(
@@ -44,7 +57,7 @@ export default function McqView({ onCorrect, onWrong }) {
   const selectOption = (id, index) => {
     if (answers[id] !== undefined) return;
     // Store only attempted questions { [id]: choiceIndex }, grouped by session.
-    setAnswersBySession((prev) => {
+    setAnswersState((prev) => {
       const sessionAnswers = prev[session] ?? {};
       if (sessionAnswers[id] !== undefined) return prev;
       return { ...prev, [session]: { ...sessionAnswers, [id]: index } };
@@ -56,7 +69,7 @@ export default function McqView({ onCorrect, onWrong }) {
   };
 
   const retryQuestion = (id) => {
-    setAnswersBySession((prev) => {
+    setAnswersState((prev) => {
       const sessionAnswers = prev[session];
       if (!sessionAnswers || sessionAnswers[id] === undefined) return prev;
       const next = { ...sessionAnswers };
@@ -71,7 +84,7 @@ export default function McqView({ onCorrect, onWrong }) {
   };
 
   const resetSession = () => {
-    setAnswersBySession((prev) => {
+    setAnswersState((prev) => {
       if (!prev[session]) return prev;
       const next = { ...prev };
       delete next[session];

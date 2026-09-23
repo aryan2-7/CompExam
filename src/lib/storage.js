@@ -9,6 +9,7 @@ const KEYS = {
   theoryCurrent: "compexamexe_theory_current",
   mcqSession: "compexamexe_mcq_session",
   mcqAnswers: "compexamexe_mcq_answers",
+  theoryReviewed: "compexamexe_theory_reviewed",
 };
 
 export const codeKey = (id) => `compexamexe_code_${id}`;

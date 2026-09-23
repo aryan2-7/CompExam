@@ -1,4 +1,42 @@
-export default function TopBar({ solved, total }) {
+import { useLocation } from "react-router-dom";
+
+export default function TopBar({
+  codingSolved = 0,
+  codingTotal = 0,
+  theoryReviewed = 0,
+  theoryTotal = 0,
+  mcqAnswered = 0,
+  mcqTotal = 0,
+  mcqDoneSessions = [],
+  // legacy props (kept working if someone still passes them)
+  solved,
+  total,
+}) {
+  const { pathname } = useLocation();
+
+  const coding = {
+    solved: solved ?? codingSolved,
+    total: total ?? codingTotal,
+  };
+
+  let progress;
+  let title = "questions completed";
+  if (pathname.startsWith("/theory")) {
+    progress = `${theoryReviewed}/${theoryTotal} theory reviewed`;
+    title = "theory questions reviewed";
+  } else if (pathname.startsWith("/mcq")) {
+    title =
+      mcqDoneSessions.length > 0
+        ? `sessions done: ${mcqDoneSessions.join(", ")}`
+        : "mcq questions answered";
+    progress =
+      mcqDoneSessions.length > 0
+        ? `${mcqAnswered}/${mcqTotal} mcq · done: ${mcqDoneSessions.join(", ")}`
+        : `${mcqAnswered}/${mcqTotal} mcq`;
+  } else {
+    progress = `${coding.solved}/${coding.total} questions`;
+  }
+
   return (
     <header className="topbar">
       <div className="brand">
@@ -8,8 +46,8 @@ export default function TopBar({ solved, total }) {
         </span>
       </div>
       <div className="topbar-right">
-        <div className="progress" title="questions completed">
-          {solved}/{total} questions
+        <div className="progress progress-truncate" title={title}>
+          {progress}
         </div>
         <a
           className="github-link"
